@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transit Alert</title>
+  <!-- Bootstrap 4 CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <!-- Leaflet Routing Machine CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    #map { 
+      height: 300px; 
+      width: 100%;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+    .card {
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+    .card-header {
+      border-radius: 15px 15px 0 0 !important;
+      background-color: #007bff;
+      color: white;
+    }
+    .btn-primary {
+      background-color: #007bff;
+      border-color: #007bff;
+    }
+    .alert-info {
+      background-color: #d1ecf1;
+      border-color: #bee5eb;
+      color: #0c5460;
+    }
+    .settings-panel {
+      display: none;
+      padding: 15px;
+      background-color: white;
+      border-radius: 10px;
+      margin-top: 15px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .distance-badge {
+      cursor: pointer;
+      margin-right: 5px;
+    }
+    .leaflet-routing-container {
+      background-color: white;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+       /* Add this new style for GPS accuracy indicator */
+       .gps-status {
+      font-size: 12px;
+      margin-top: 5px;
+      display: none;
+    }
+    .gps-accuracy {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 5px;
+    }
+    .high-accuracy { background-color: #28a745; }
+    .medium-accuracy { background-color: #ffc107; }
+    .low-accuracy { background-color: #dc3545; }
+  </style>
+</head>
+<body>
+  <div class="container mt-3">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="text-center mb-0"><i class="fas fa-bus"></i> Transit Alert</h5>
+      </div>
+      <div class="card-body">
+        <!-- Map to show locations and route -->
+        <div id="map"></div>
+        
+        <!-- Location Inputs -->
+        <div class="form-group">
+          <label for="startLocation"><i class="fas fa-map-marker-alt"></i> Start Location:</label>
+          <div class="input-group">
+            <input type="text" class="form-control" id="startLocation" placeholder="Your current location">
+            <div class="input-group-append">
+              <button class="btn btn-outline-secondary" id="useCurrentLocationBtn" type="button">
+                <i class="fas fa-location-arrow"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="destination"><i class="fas fa-flag-checkered"></i> Destination:</label>
+          <input type="text" class="form-control" id="destination" placeholder="Enter your destination">
+        </div>
+        
+        <button class="btn btn-primary btn-block" id="startTrackingBtn">
+          <i class="fas fa-play"></i> Start Tracking
+        </button>
+        
+        <button class="btn btn-outline-secondary btn-block mt-2" id="settingsBtn">
+          <i class="fas fa-cog"></i> Settings
+        </button>
+        
+        <!-- Settings Panel -->
+        <div id="settingsPanel" class="settings-panel">
+          <div class="form-group">
+            <label>Alert Distance:</label>
+            <div>
+              <span class="badge badge-primary distance-badge" data-distance="0.5">500m</span>
+              <span class="badge badge-secondary distance-badge" data-distance="1">1km</span>
+              <span class="badge badge-secondary distance-badge" data-distance="2">2km</span>
+              <span class="badge badge-secondary distance-badge" data-distance="5">5km</span>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="alertSound">Alert Sound:</label>
+            <select class="form-control" id="alertSound">
+              <option value="default">Default Beep</option>
+              <option value="bell">Bell</option>
+              <option value="chime">Chime</option>
+              <option value="custom">Custom (URL)</option>
+            </select>
+          </div>
+          
+          <div class="form-group" id="customSoundGroup" style="display:none;">
+            <label for="customSoundUrl">Custom Sound URL:</label>
+            <input type="text" class="form-control" id="customSoundUrl" placeholder="Enter sound URL">
+          </div>
+          
+          <button class="btn btn-success btn-block" id="saveSettingsBtn">
+            <i class="fas fa-save"></i> Save Settings
+          </button>
+        </div>
+        
+        <!-- Status Alert -->
+        <div id="statusAlert" class="alert alert-info mt-3" style="display: none;">
+          <strong><i class="fas fa-bell"></i> Alert:</strong> You are approaching your destination!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio element for alerts -->
+  <audio id="alertAudio"></audio>
+
+  <div class="gps-status">
+    <span id="gpsAccuracyIndicator" class="gps-accuracy"></span>
+    <span id="gpsStatusText">Acquiring GPS signal...</span>
+    <span id="gpsAccuracyValue"></span>
+  </div>
+
+  <!-- Include Bootstrap & JS dependencies -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Include Leaflet.js -->
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+  <!-- Leaflet Routing Machine -->
+  <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+
+  <script>
+    // App configuration
+
+      // Updated configuration
+      const config = {
+      alertDistance: 1,  // Default 1km
+      alertSound: 'default',
+      customSoundUrl: '',
+      gpsOptions: {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      },
+      minAccuracy: 100 // meters - only accept locations with this accuracy or better
+    };
+
+    // const config = {
+    //   alertDistance: 1,
+    //   alertSound: 'default',
+    //   customSoundUrl: ''
+    // };
+    
+    let map, userMarker, startMarker, destinationMarker, geolocationInterval;
+    let startLocation = null;
+    let destination = null;
+    let isTracking = false;
+    let audio = document.getElementById('alertAudio');
+    let routeControl = null;
+    
+    // Sample sound URLs (in a real app, you would host these or use proper URLs)
+    const soundFiles = {
+      default: 'https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3',
+      bell: 'https://assets.mixkit.co/sfx/preview/mixkit-morning-clock-alarm-1003.mp3',
+      chime: 'https://assets.mixkit.co/sfx/preview/mixkit-positive-interface-beep-221.mp3'
+    };
+
+    // Initialize map and markers
+    function initMap() {
+      // First try to get current location for initial map view
+      getCurrentLocation(function(initialLocation) {
+        const initialCoords = initialLocation || [18.5204, 73.8567]; // Default to Pune if location not available
+        
+        map = L.map('map').setView(initialCoords, 13);
+
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Add a marker for the user (initial position)
+        userMarker = L.marker(initialCoords, {
+          icon: L.divIcon({
+            html: '<i class="fas fa-user" style="color: blue; font-size: 24px;"></i>',
+            className: 'dummy'
+          })
+        }).addTo(map).bindPopup("Your current location");
+        
+        // Start location marker
+        startMarker = L.marker(initialCoords, {
+          icon: L.divIcon({
+            html: '<i class="fas fa-map-marker-alt" style="color: green; font-size: 24px;"></i>',
+            className: 'dummy'
+          })
+        }).addTo(map).bindPopup("Start location").setOpacity(0);
+        
+        // Destination marker
+        destinationMarker = L.marker(initialCoords, {
+          icon: L.divIcon({
+            html: '<i class="fas fa-flag" style="color: red; font-size: 24px;"></i>',
+            className: 'dummy'
+          })
+        }).addTo(map).bindPopup("Destination").setOpacity(0);
+        
+        // If we got current location, set it as start location
+        if (initialLocation) {
+          startLocation = initialLocation;
+          $('#startLocation').val("Current Location");
+          startMarker.setLatLng(initialLocation).setOpacity(1);
+        }
+      });
+    }
+
+    // Get user's location and track
+   // Updated startTracking function
+   function startTracking() {
+      if (!startLocation || !destination) {
+        alert("Please set both start location and destination!");
+        return;
+      }
+      
+      if (navigator.geolocation) {
+        isTracking = true;
+        $('#startTrackingBtn').html('<i class="fas fa-stop"></i> Stop Tracking');
+        
+        // First get high-accuracy position before starting tracking
+        getCurrentLocation(function(initialLocation) {
+          if (!initialLocation) {
+            if (confirm("Couldn't get accurate location. Continue with possibly inaccurate tracking?")) {
+              startTrackingInterval();
+            } else {
+              stopTracking();
+            }
+            return;
+          }
+          
+          // Update user position with accurate location
+          userMarker.setLatLng([initialLocation.lat, initialLocation.lng]);
+          startTrackingInterval();
+        });
+        
+        calculateRoute(startLocation, destination);
+      } else {
+        alert("Geolocation is not supported by this browser.");
+      }
+    }
+    // Calculate and display route between points
+    function calculateRoute(start, end) {
+      // Remove existing route if any
+      if (routeControl) {
+        map.removeControl(routeControl);
+      }
+      
+      // Create new route
+      routeControl = L.Routing.control({
+        waypoints: [
+          L.latLng(start.lat, start.lng),
+          L.latLng(end.lat, end.lng)
+        ],
+        routeWhileDragging: false,
+        show: false, // Hide the instructions panel
+        lineOptions: {
+          styles: [{color: '#4285F4', opacity: 0.8, weight: 6}] // Blue route like Google Maps
+        },
+        addWaypoints: false, // Disable adding waypoints
+        draggableWaypoints: false, // Disable dragging waypoints
+        fitSelectedRoutes: true
+      }).addTo(map);
+      
+      // Fit the map to show the entire route
+      const bounds = L.latLngBounds([start, end]);
+      map.fitBounds(bounds, { padding: [50, 50] });
+    }
+
+    // Stop tracking
+    function stopTracking() {
+      clearInterval(geolocationInterval);
+      isTracking = false;
+      $('#startTrackingBtn').html('<i class="fas fa-play"></i> Start Tracking');
+      $('#statusAlert').hide();
+      
+      // Remove route if it exists
+      if (routeControl) {
+        map.removeControl(routeControl);
+        routeControl = null;
+      }
+    }
+
+    function startTrackingInterval() {
+      geolocationInterval = setInterval(() => {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const accuracy = position.coords.accuracy;
+            updateGpsStatus(accuracy);
+            
+            // Only update if we have reasonable accuracy
+            if (accuracy <= config.minAccuracy || !config.minAccuracy) {
+              const userLocation = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+              };
+
+              userMarker.setLatLng(userLocation);
+              
+              const distance = getDistance(userLocation, destination);
+              $('#statusAlert').html(`
+                <strong><i class="fas fa-bell"></i> Alert:</strong> 
+                You are ${distance.toFixed(1)}km from your destination!
+                ${accuracy ? `(Accuracy: ${Math.round(accuracy)}m)` : ''}
+              `);
+              
+              if (distance <= config.alertDistance) {
+                if ($('#statusAlert').is(':hidden')) {
+                  $('#statusAlert').show();
+                  playAlertSound();
+                }
+              } else {
+                $('#statusAlert').hide();
+              }
+            }
+          },
+          (error) => {
+            console.error("Geolocation error: " + error.message);
+          },
+          config.gpsOptions
+        );
+      }, 5000);
+    }
+
+
+    // Calculate distance between two points using Haversine formula (in km)
+    function getDistance(from, to) {
+      const R = 6371; // Radius of the Earth in km
+      const dLat = (to.lat - from.lat) * Math.PI / 180;
+      const dLon = (to.lng - from.lng) * Math.PI / 180;
+      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(from.lat * Math.PI / 180) * Math.cos(to.lat * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      const distance = R * c; // Distance in km
+      return distance;
+    }
+
+    // Geocode location using OpenCage API
+    function geocodeLocation(locationName, callback) {
+      const apiKey = '600542ded67c4268978d29b5906e6d4e'; // Replace with your OpenCage API key
+      const geocodeUrl = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(locationName)}&key=${apiKey}`;
+
+      $.getJSON(geocodeUrl, function(data) {
+        if (data.results && data.results.length > 0) {
+          const location = data.results[0].geometry;
+          callback({ lat: location.lat, lng: location.lng });
+        } else {
+          alert("Location not found: " + locationName);
+          callback(null);
+        }
+      }).fail(function() {
+        alert("Error geocoding location. Please try again.");
+        callback(null);
+      });
+    }
+
+    // Play alert sound based on configuration
+    function playAlertSound() {
+      let soundUrl = soundFiles[config.alertSound];
+      if (config.alertSound === 'custom' && config.customSoundUrl) {
+        soundUrl = config.customSoundUrl;
+      }
+      
+      if (soundUrl) {
+        audio.src = soundUrl;
+        audio.play().catch(e => console.error("Audio play failed:", e));
+      }
+    }
+
+    // Get current location
+     // Updated getCurrentLocation function
+     function getCurrentLocation(callback) {
+      if (navigator.geolocation) {
+        $('.gps-status').show();
+        $('#gpsStatusText').text("Acquiring GPS signal...");
+        $('#gpsAccuracyIndicator').removeClass('high-accuracy medium-accuracy low-accuracy');
+        
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const accuracy = position.coords.accuracy;
+            updateGpsStatus(accuracy);
+            
+            if (accuracy > config.minAccuracy) {
+              $('#gpsStatusText').text("Poor accuracy - moving may help");
+              callback(null);
+              return;
+            }
+            
+            const location = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+              accuracy: accuracy
+            };
+            callback(location);
+          },
+          (error) => {
+            let errorMsg = "Location error: ";
+            switch(error.code) {
+              case error.PERMISSION_DENIED:
+                errorMsg += "Permission denied. Please enable location services.";
+                break;
+              case error.POSITION_UNAVAILABLE:
+                errorMsg += "Location unavailable. Check your GPS/WiFi.";
+                break;
+              case error.TIMEOUT:
+                errorMsg += "Request timed out. Try again in a better location.";
+                break;
+              default:
+                errorMsg += "Unknown error.";
+            }
+            $('#gpsStatusText').text(errorMsg);
+            $('#gpsAccuracyIndicator').addClass('low-accuracy');
+            callback(null);
+          },
+          config.gpsOptions
+        );
+      } else {
+        $('#gpsStatusText').text("Geolocation not supported by this browser.");
+        callback(null);
+      }
+    }
+
+
+    function updateGpsStatus(accuracy) {
+      $('#gpsAccuracyValue').text(`(${Math.round(accuracy)}m)`);
+      
+      if (accuracy < 20) {
+        $('#gpsAccuracyIndicator').addClass('high-accuracy');
+        $('#gpsStatusText').text("High accuracy GPS signal");
+      } 
+      else if (accuracy < 100) {
+        $('#gpsAccuracyIndicator').addClass('medium-accuracy');
+        $('#gpsStatusText').text("Medium accuracy GPS signal");
+      }
+      else {
+        $('#gpsAccuracyIndicator').addClass('low-accuracy');
+        $('#gpsStatusText').text("Low accuracy - move to open area");
+      }
+    }
+
+    // Initialize the app
+    $(document).ready(function() {
+      initMap();
+      
+      // Use current location button
+      $('#useCurrentLocationBtn').click(function() {
+        getCurrentLocation(function(location) {
+          if (location) {
+            startLocation = location;
+            $('#startLocation').val("Current Location");
+            startMarker.setLatLng(location).setOpacity(1);
+            userMarker.setLatLng(location);
+            map.setView(location, 13);
+          } else {
+            alert("Could not get your current location. Please enter it manually.");
+          }
+        });
+      });
+      
+      // Start/Stop tracking button
+      $('#startTrackingBtn').click(function() {
+        if (isTracking) {
+          stopTracking();
+          return;
+        }
+        
+        const destinationName = $('#destination').val();
+        const startLocationName = $('#startLocation').val();
+        
+        if (!destinationName) {
+          alert("Please enter a destination.");
+          return;
+        }
+        
+        if (!startLocation) {
+          // If start location isn't set, try to geocode the entered value
+          if (!startLocationName) {
+            alert("Please set a start location or use your current location.");
+            return;
+          }
+          
+          geocodeLocation(startLocationName, function(loc) {
+            if (loc) {
+              startLocation = loc;
+              startMarker.setLatLng(loc).setOpacity(1);
+              geocodeDestination(destinationName);
+            }
+          });
+        } else {
+          geocodeDestination(destinationName);
+        }
+      });
+      
+      // Geocode destination and start tracking
+      function geocodeDestination(destinationName) {
+        geocodeLocation(destinationName, function(loc) {
+          if (loc) {
+            destination = loc;
+            destinationMarker.setLatLng(loc).setOpacity(1);
+            
+            // Start tracking
+            startTracking();
+          }
+        });
+      }
+      
+      // Settings button
+      $('#settingsBtn').click(function() {
+        $('#settingsPanel').slideToggle();
+      });
+      
+      // Alert distance selection
+      $('.distance-badge').click(function() {
+        $('.distance-badge').removeClass('badge-primary').addClass('badge-secondary');
+        $(this).removeClass('badge-secondary').addClass('badge-primary');
+        config.alertDistance = parseFloat($(this).data('distance'));
+      });
+      
+      // Alert sound selection
+      $('#alertSound').change(function() {
+        config.alertSound = $(this).val();
+        if ($(this).val() === 'custom') {
+          $('#customSoundGroup').show();
+        } else {
+          $('#customSoundGroup').hide();
+        }
+      });
+      
+      // Save settings
+      $('#saveSettingsBtn').click(function() {
+        if (config.alertSound === 'custom') {
+          config.customSoundUrl = $('#customSoundUrl').val();
+        }
+        $('#settingsPanel').slideUp();
+        alert("Settings saved!");
+      });
+    });
+  </script>
+</body>
+</html>
