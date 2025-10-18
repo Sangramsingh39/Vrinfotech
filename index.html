@@ -1,591 +1,838 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Transit Alert</title>
-  <!-- Bootstrap 4 CSS -->
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Font Awesome for iconsvbv -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-  <!-- Leaflet Routing Machine CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
-
-  <style>
-    body {
-      background-color: #f8f9fa;
-    }
-    #map { 
-      height: 300px; 
-      width: 100%;
-      border-radius: 10px;
-      margin-bottom: 15px;
-    }
-    .card {
-      border-radius: 15px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
-    }
-    .card-header {
-      border-radius: 15px 15px 0 0 !important;
-      background-color: #007bff;
-      color: white;
-    }
-    .btn-primary {
-      background-color: #007bff;
-      border-color: #007bff;
-    }
-    .alert-info {
-      background-color: #d1ecf1;
-      border-color: #bee5eb;
-      color: #0c5460;
-    }
-    .settings-panel {
-      display: none;
-      padding: 15px;
-      background-color: white;
-      border-radius: 10px;
-      margin-top: 15px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .distance-badge {
-      cursor: pointer;
-      margin-right: 5px;
-    }
-    .leaflet-routing-container {
-      background-color: white;
-      padding: 10px;
-      border-radius: 5px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-
-       /* Add this new style for GPS accuracy indicator */
-       .gps-status {
-      font-size: 12px;
-      margin-top: 5px;
-      display: none;
-    }
-    .gps-accuracy {
-      display: inline-block;
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      margin-right: 5px;
-    }
-    .high-accuracy { background-color: #28a745; }
-    .medium-accuracy { background-color: #ffc107; }
-    .low-accuracy { background-color: #dc3545; }
-  </style>
-</head>
-<body>
-  <div class="container mt-3">
-    <div class="card">
-      <div class="card-header">
-        <h5 class="text-center mb-0"><i class="fas fa-bus"></i> Transit Alert</h5>
-      </div>
-      <div class="card-body">
-        <!-- Map to show locations and route -->
-        <div id="map"></div>
-        
-        <!-- Location Inputs -->
-        <div class="form-group">
-          <label for="startLocation"><i class="fas fa-map-marker-alt"></i> Start Location:</label>
-          <div class="input-group">
-            <input type="text" class="form-control" id="startLocation" placeholder="Your current location">
-            <div class="input-group-append">
-              <button class="btn btn-outline-secondary" id="useCurrentLocationBtn" type="button">
-                <i class="fas fa-location-arrow"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <label for="destination"><i class="fas fa-flag-checkered"></i> Destination:</label>
-          <input type="text" class="form-control" id="destination" placeholder="Enter your destination">
-        </div>
-        
-        <button class="btn btn-primary btn-block" id="startTrackingBtn">
-          <i class="fas fa-play"></i> Start Tracking
-        </button>
-        
-        <button class="btn btn-outline-secondary btn-block mt-2" id="settingsBtn">
-          <i class="fas fa-cog"></i> Settings
-        </button>
-        
-        <!-- Settings Panel -->
-        <div id="settingsPanel" class="settings-panel">
-          <div class="form-group">
-            <label>Alert Distance:</label>
-            <div>
-              <span class="badge badge-primary distance-badge" data-distance="0.5">500m</span>
-              <span class="badge badge-secondary distance-badge" data-distance="1">1km</span>
-              <span class="badge badge-secondary distance-badge" data-distance="2">2km</span>
-              <span class="badge badge-secondary distance-badge" data-distance="5">5km</span>
-            </div>
-          </div>
-          
-          <div class="form-group">
-            <label for="alertSound">Alert Sound:</label>
-            <select class="form-control" id="alertSound">
-              <option value="default">Default Beep</option>
-              <option value="bell">Bell</option>
-              <option value="chime">Chime</option>
-              <option value="custom">Custom (URL)</option>
-            </select>
-          </div>
-          
-          <div class="form-group" id="customSoundGroup" style="display:none;">
-            <label for="customSoundUrl">Custom Sound URL:</label>
-            <input type="text" class="form-control" id="customSoundUrl" placeholder="Enter sound URL">
-          </div>
-          
-          <button class="btn btn-success btn-block" id="saveSettingsBtn">
-            <i class="fas fa-save"></i> Save Settings
-          </button>
-        </div>
-        
-        <!-- Status Alert -->
-        <div id="statusAlert" class="alert alert-info mt-3" style="display: none;">
-          <strong><i class="fas fa-bell"></i> Alert:</strong> You are approaching your destination!
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Audio element for alerts -->
-  <audio id="alertAudio"></audio>
-
-  <div class="gps-status">
-    <span id="gpsAccuracyIndicator" class="gps-accuracy"></span>
-    <span id="gpsStatusText">Acquiring GPS signal...</span>
-    <span id="gpsAccuracyValue"></span>
-  </div>
-
-  <!-- Include Bootstrap & JS dependencies -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
-
-  <!-- Include Leaflet.js -->
-  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-  <!-- Leaflet Routing Machine -->
-  <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
-
-  <script>
-    // App configuration
-
-      // Updated configuration
-      const config = {
-      alertDistance: 1,  // Default 1km
-      alertSound: 'default',
-      customSoundUrl: '',
-      gpsOptions: {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0
-      },
-      minAccuracy: 100 // meters - only accept locations with this accuracy or better
-    };
-
-    // const config = {
-    //   alertDistance: 1,
-    //   alertSound: 'default',
-    //   customSoundUrl: ''
-    // };
+    <meta charset="utf-8">
+    <title>VRInfoTech - Leading Artificial Intelligence & IT Solutions Company</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="artificial intelligence, agentic AI, IT solutions, web development, machine learning, cloud services, digital marketing, VRInfoTech" name="keywords">
+    <meta content="VRInfoTech specializes in agentic AI, machine learning, web development, cloud services, and digital marketing solutions to empower businesses with innovative and scalable technology." name="description">
     
-    let map, userMarker, startMarker, destinationMarker, geolocationInterval;
-    let startLocation = null;
-    let destination = null;
-    let isTracking = false;
-    let audio = document.getElementById('alertAudio');
-    let routeControl = null;
-    
-    // Sample sound URLs (in a real app, you would host these or use proper URLs)
-    const soundFiles = {
-      default: 'https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3',
-      bell: 'https://assets.mixkit.co/sfx/preview/mixkit-morning-clock-alarm-1003.mp3',
-      chime: 'https://assets.mixkit.co/sfx/preview/mixkit-positive-interface-beep-221.mp3'
-    };
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon">
 
-    // Initialize map and markers
-    function initMap() {
-      // First try to get current location for initial map view
-      getCurrentLocation(function(initialLocation) {
-        const initialCoords = initialLocation || [18.5204, 73.8567]; // Default to Pune if location not available
-        
-        map = L.map('map').setView(initialCoords, 13);
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Ubuntu:wght@500;700&display=swap" rel="stylesheet">
 
-        // Add OpenStreetMap tiles
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
 
-        // Add a marker for the user (initial position)
-        userMarker = L.marker(initialCoords, {
-          icon: L.divIcon({
-            html: '<i class="fas fa-user" style="color: blue; font-size: 24px;"></i>',
-            className: 'dummy'
-          })
-        }).addTo(map).bindPopup("Your current location");
-        
-        // Start location marker
-        startMarker = L.marker(initialCoords, {
-          icon: L.divIcon({
-            html: '<i class="fas fa-map-marker-alt" style="color: green; font-size: 24px;"></i>',
-            className: 'dummy'
-          })
-        }).addTo(map).bindPopup("Start location").setOpacity(0);
-        
-        // Destination marker
-        destinationMarker = L.marker(initialCoords, {
-          icon: L.divIcon({
-            html: '<i class="fas fa-flag" style="color: red; font-size: 24px;"></i>',
-            className: 'dummy'
-          })
-        }).addTo(map).bindPopup("Destination").setOpacity(0);
-        
-        // If we got current location, set it as start location
-        if (initialLocation) {
-          startLocation = initialLocation;
-          $('#startLocation').val("Current Location");
-          startMarker.setLatLng(initialLocation).setOpacity(1);
-        }
-      });
-    }
+    <!-- Libraries Stylesheet -->
+    <link href="lib/animate/animate.min.css" rel="stylesheet">
+    <link href="lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
 
-    // Get user's location and track
-   // Updated startTracking function
-   function startTracking() {
-      if (!startLocation || !destination) {
-        alert("Please set both start location and destination!");
-        return;
-      }
-      
-      if (navigator.geolocation) {
-        isTracking = true;
-        $('#startTrackingBtn').html('<i class="fas fa-stop"></i> Stop Tracking');
-        
-        // First get high-accuracy position before starting tracking
-        getCurrentLocation(function(initialLocation) {
-          if (!initialLocation) {
-            if (confirm("Couldn't get accurate location. Continue with possibly inaccurate tracking?")) {
-              startTrackingInterval();
-            } else {
-              stopTracking();
-            }
-            return;
-          }
-          
-          // Update user position with accurate location
-          userMarker.setLatLng([initialLocation.lat, initialLocation.lng]);
-          startTrackingInterval();
-        });
-        
-        calculateRoute(startLocation, destination);
-      } else {
-        alert("Geolocation is not supported by this browser.");
-      }
-    }
-    // Calculate and display route between points
-    function calculateRoute(start, end) {
-      // Remove existing route if any
-      if (routeControl) {
-        map.removeControl(routeControl);
-      }
-      
-      // Create new route
-      routeControl = L.Routing.control({
-        waypoints: [
-          L.latLng(start.lat, start.lng),
-          L.latLng(end.lat, end.lng)
-        ],
-        routeWhileDragging: false,
-        show: false, // Hide the instructions panel
-        lineOptions: {
-          styles: [{color: '#4285F4', opacity: 0.8, weight: 6}] // Blue route like Google Maps
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="css/style.css" rel="stylesheet">
+
+    <!-- SEO Meta Tags -->
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="VRInfoTech">
+    <meta name="revisit-after" content="7 days">
+    <meta name="language" content="English">
+
+    <!-- Open Graph Tags for Social Media -->
+    <meta property="og:title" content="VRInfoTech - Artificial Intelligence & IT Solutions Company">
+    <meta property="og:description" content="Transform your business with VRInfoTech's agentic AI, machine learning, web development, cloud services, and digital marketing solutions.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.vrinfotech.org/">
+    <meta property="og:image" content="https://www.vrinfotech.org/img/og-image.jpg">
+    <meta property="og:site_name" content="VRInfoTech">
+
+    <!-- Twitter Card Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="VRInfoTech - Artificial Intelligence & IT Solutions Company">
+    <meta name="twitter:description" content="Transform your business with VRInfoTech's agentic AI, machine learning, web development, cloud services, and digital marketing solutions.">
+    <meta name="twitter:image" content="https://www.vrinfotech.org/img/og-image.jpg">
+    <meta name="twitter:site" content="@VRInfoTech">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://www.vrinfotech.org/">
+
+    <!-- Structured Data (JSON-LD) for Organization -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "VRInfoTech",
+        "url": "https://www.vrinfotech.org/",
+        "logo": "https://www.vrinfotech.org/img/logo.png",
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+91-7796390239",
+            "contactType": "Customer Service",
+            "email": "vrinfotech39@gmail.com",
+            "areaServed": "Global",
+            "availableLanguage": "English"
         },
-        addWaypoints: false, // Disable adding waypoints
-        draggableWaypoints: false, // Disable dragging waypoints
-        fitSelectedRoutes: true
-      }).addTo(map);
-      
-      // Fit the map to show the entire route
-      const bounds = L.latLngBounds([start, end]);
-      map.fitBounds(bounds, { padding: [50, 50] });
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Pune",
+            "addressCountry": "India"
+        },
+        "sameAs": [
+            "https://www.facebook.com/VRInfoTech",
+            "https://www.twitter.com/VRInfoTech",
+            "https://www.instagram.com/VRInfoTech",
+            "https://www.linkedin.com/company/VRInfoTech",
+            "https://www.youtube.com/VRInfoTech"
+        ]
     }
+    </script>
+</head>
 
-    // Stop tracking
-    function stopTracking() {
-      clearInterval(geolocationInterval);
-      isTracking = false;
-      $('#startTrackingBtn').html('<i class="fas fa-play"></i> Start Tracking');
-      $('#statusAlert').hide();
-      
-      // Remove route if it exists
-      if (routeControl) {
-        map.removeControl(routeControl);
-        routeControl = null;
-      }
-    }
-
-    function startTrackingInterval() {
-      geolocationInterval = setInterval(() => {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const accuracy = position.coords.accuracy;
-            updateGpsStatus(accuracy);
-            
-            // Only update if we have reasonable accuracy
-            if (accuracy <= config.minAccuracy || !config.minAccuracy) {
-              const userLocation = {
-                lat: position.coords.latitude,
-                lng: position.coords.longitude
-              };
-
-              userMarker.setLatLng(userLocation);
-              
-              const distance = getDistance(userLocation, destination);
-              $('#statusAlert').html(`
-                <strong><i class="fas fa-bell"></i> Alert:</strong> 
-                You are ${distance.toFixed(1)}km from your destination!
-                ${accuracy ? `(Accuracy: ${Math.round(accuracy)}m)` : ''}
-              `);
-              
-              if (distance <= config.alertDistance) {
-                if ($('#statusAlert').is(':hidden')) {
-                  $('#statusAlert').show();
-                  playAlertSound();
-                }
-              } else {
-                $('#statusAlert').hide();
-              }
-            }
-          },
-          (error) => {
-            console.error("Geolocation error: " + error.message);
-          },
-          config.gpsOptions
-        );
-      }, 5000);
-    }
+<body>
+    <!-- Spinner Start -->
+    <div id="spinner"
+        class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+        <div class="spinner-grow text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+    <!-- Spinner End -->
 
 
-    // Calculate distance between two points using Haversine formula (in km)
-    function getDistance(from, to) {
-      const R = 6371; // Radius of the Earth in km
-      const dLat = (to.lat - from.lat) * Math.PI / 180;
-      const dLon = (to.lng - from.lng) * Math.PI / 180;
-      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.cos(from.lat * Math.PI / 180) * Math.cos(to.lat * Math.PI / 180) *
-                Math.sin(dLon / 2) * Math.sin(dLon / 2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      const distance = R * c; // Distance in km
-      return distance;
-    }
-
-    // Geocode location using OpenCage API
-    function geocodeLocation(locationName, callback) {
-      const apiKey = '600542ded67c4268978d29b5906e6d4e'; // Replace with your OpenCage API key
-      const geocodeUrl = `https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(locationName)}&key=${apiKey}`;
-
-      $.getJSON(geocodeUrl, function(data) {
-        if (data.results && data.results.length > 0) {
-          const location = data.results[0].geometry;
-          callback({ lat: location.lat, lng: location.lng });
-        } else {
-          alert("Location not found: " + locationName);
-          callback(null);
-        }
-      }).fail(function() {
-        alert("Error geocoding location. Please try again.");
-        callback(null);
-      });
-    }
-
-    // Play alert sound based on configuration
-    function playAlertSound() {
-      let soundUrl = soundFiles[config.alertSound];
-      if (config.alertSound === 'custom' && config.customSoundUrl) {
-        soundUrl = config.customSoundUrl;
-      }
-      
-      if (soundUrl) {
-        audio.src = soundUrl;
-        audio.play().catch(e => console.error("Audio play failed:", e));
-      }
-    }
-
-    // Get current location
-     // Updated getCurrentLocation function
-     function getCurrentLocation(callback) {
-      if (navigator.geolocation) {
-        $('.gps-status').show();
-        $('#gpsStatusText').text("Acquiring GPS signal...");
-        $('#gpsAccuracyIndicator').removeClass('high-accuracy medium-accuracy low-accuracy');
-        
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const accuracy = position.coords.accuracy;
-            updateGpsStatus(accuracy);
-            
-            if (accuracy > config.minAccuracy) {
-              $('#gpsStatusText').text("Poor accuracy - moving may help");
-              callback(null);
-              return;
-            }
-            
-            const location = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude,
-              accuracy: accuracy
-            };
-            callback(location);
-          },
-          (error) => {
-            let errorMsg = "Location error: ";
-            switch(error.code) {
-              case error.PERMISSION_DENIED:
-                errorMsg += "Permission denied. Please enable location services.";
-                break;
-              case error.POSITION_UNAVAILABLE:
-                errorMsg += "Location unavailable. Check your GPS/WiFi.";
-                break;
-              case error.TIMEOUT:
-                errorMsg += "Request timed out. Try again in a better location.";
-                break;
-              default:
-                errorMsg += "Unknown error.";
-            }
-            $('#gpsStatusText').text(errorMsg);
-            $('#gpsAccuracyIndicator').addClass('low-accuracy');
-            callback(null);
-          },
-          config.gpsOptions
-        );
-      } else {
-        $('#gpsStatusText').text("Geolocation not supported by this browser.");
-        callback(null);
-      }
-    }
+    <!-- Navbar Start -->
+    <div class="container-fluid bg-primaries  sticky-top">
+        <div class="container">
+            <nav class="navbar navbar-expand-lg navbar-dark p-0">
+                <a href="index.html" class="navbar-brand">
+                    <h1 class="text-white fnt">VRInfoTech</h1>
+                </a>
+                <button type="button" class="navbar-toggler ms-auto me-0" data-bs-toggle="collapse"
+                    data-bs-target="#navbarCollapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarCollapse">
+                    <div class="navbar-nav ms-auto">
+                        <a href="index.html" class="nav-item nav-link active">Home</a>
+                        <a href="#about-section" class="nav-item nav-link">About</a>
+                    <a href="#services-section" class="nav-item nav-link">Services</a>
+                        <!-- <a href="project.html" class="nav-item nav-link">Projects</a> -->
+                        <!-- <div class="nav-item dropdown">
+                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
+                            <div class="dropdown-menu bg-light mt-2">
+                                <a href="feature.html" class="dropdown-item">Features</a>
+                                <a href="team.html" class="dropdown-item">Our Team</a>
+                                <a href="faq.html" class="dropdown-item">FAQs</a>
+                                <a href="testimonial.html" class="dropdown-item">Testimonial</a>
+                                <a href="404.html" class="dropdown-item">404 Page</a>
+                            </div>
+                        </div> -->
+                        <a href="contact.html" class="nav-item nav-link">Contact</a>
+                    </div>
+                    <!-- <butaton type="button" class="btn text-white p-0 d-none d-lg-block" data-bs-toggle="modal"
+                        data-bs-target="#searchModal"><i class="fa fa-search"></i></butaton> -->
+                </div>
+            </nav>
+        </div>
+    </div>
+    <!-- Navbar End -->
 
 
-    function updateGpsStatus(accuracy) {
-      $('#gpsAccuracyValue').text(`(${Math.round(accuracy)}m)`);
-      
-      if (accuracy < 20) {
-        $('#gpsAccuracyIndicator').addClass('high-accuracy');
-        $('#gpsStatusText').text("High accuracy GPS signal");
-      } 
-      else if (accuracy < 100) {
-        $('#gpsAccuracyIndicator').addClass('medium-accuracy');
-        $('#gpsStatusText').text("Medium accuracy GPS signal");
-      }
-      else {
-        $('#gpsAccuracyIndicator').addClass('low-accuracy');
-        $('#gpsStatusText').text("Low accuracy - move to open area");
-      }
-    }
+    <!-- Hero Start -->
+    <div class="container-fluid pt-5 bg-darks hero-header mb-5">
+    <!-- Background Video -->
+    <video autoplay muted loop playsinline class="bg-video">
+        <source src="img/bgVideo3.o.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
 
-    // Initialize the app
-    $(document).ready(function() {
-      initMap();
-      
-      // Use current location button
-      $('#useCurrentLocationBtn').click(function() {
-        getCurrentLocation(function(location) {
-          if (location) {
-            startLocation = location;
-            $('#startLocation').val("Current Location");
-            startMarker.setLatLng(location).setOpacity(1);
-            userMarker.setLatLng(location);
-            map.setView(location, 13);
-          } else {
-            alert("Could not get your current location. Please enter it manually.");
-          }
-        });
-      });
-      
-      // Start/Stop tracking button
-      $('#startTrackingBtn').click(function() {
-        if (isTracking) {
-          stopTracking();
-          return;
-        }
-        
-        const destinationName = $('#destination').val();
-        const startLocationName = $('#startLocation').val();
-        
-        if (!destinationName) {
-          alert("Please enter a destination.");
-          return;
-        }
-        
-        if (!startLocation) {
-          // If start location isn't set, try to geocode the entered value
-          if (!startLocationName) {
-            alert("Please set a start location or use your current location.");
-            return;
-          }
-          
-          geocodeLocation(startLocationName, function(loc) {
-            if (loc) {
-              startLocation = loc;
-              startMarker.setLatLng(loc).setOpacity(1);
-              geocodeDestination(destinationName);
-            }
-          });
-        } else {
-          geocodeDestination(destinationName);
-        }
-      });
-      
-      // Geocode destination and start tracking
-      function geocodeDestination(destinationName) {
-        geocodeLocation(destinationName, function(loc) {
-          if (loc) {
-            destination = loc;
-            destinationMarker.setLatLng(loc).setOpacity(1);
-            
-            // Start tracking
-            startTracking();
-          }
-        });
-      }
-      
-      // Settings button
-      $('#settingsBtn').click(function() {
-        $('#settingsPanel').slideToggle();
-      });
-      
-      // Alert distance selection
-      $('.distance-badge').click(function() {
-        $('.distance-badge').removeClass('badge-primary').addClass('badge-secondary');
-        $(this).removeClass('badge-secondary').addClass('badge-primary');
-        config.alertDistance = parseFloat($(this).data('distance'));
-      });
-      
-      // Alert sound selection
-      $('#alertSound').change(function() {
-        config.alertSound = $(this).val();
-        if ($(this).val() === 'custom') {
-          $('#customSoundGroup').show();
-        } else {
-          $('#customSoundGroup').hide();
-        }
-      });
-      
-      // Save settings
-      $('#saveSettingsBtn').click(function() {
-        if (config.alertSound === 'custom') {
-          config.customSoundUrl = $('#customSoundUrl').val();
-        }
-        $('#settingsPanel').slideUp();
-        alert("Settings saved!");
-      });
-    });
-  </script>
+    <div class="container pt-5 position-relative">
+        <div class="row g-5 pt-5">
+            <div class="col-lg-6 align-self-center text-center text-lg-start mb-lg-5">
+                <div class="btn btn-sm border rounded-pill textg px-3 mb-3 animated slideInRight">VRInfoTech</div>
+                 <h1 class="display-4 textg mb-4 animated slideInRight">
+                Empowering Businesses with AI & Web Solutions
+            </h1>
+            <p class="text-white mb-4 animated slideInRight">
+                At <strong>VRInfoTech</strong>, we specialize in building intelligent solutions 
+                that transform the way businesses operate. From <strong>Agentic AI</strong> 
+                and <strong>Generative AI</strong> to cutting-edge <strong>Web Development</strong>, 
+                we help organizations unlock innovation, automation, and growth.
+            </p>
+                <a href="" class="btn btn-light py-sm-3 px-sm-5 rounded-pill me-3 animated slideInRight">Read More</a>
+                <a href="" class="btn btn-outline-light py-sm-3 px-sm-5 rounded-pill animated slideInRight">Contact Us</a>
+            </div>
+            <div class="col-lg-6 align-self-end text-center text-lg-end">
+                <img class="img-fluid" src="img/Robot.gif" alt="">
+            </div>
+            <div class="col-lg-6 align-self-end text-center text-lg-end">
+</div>
+        </div>
+    </div>
+</div>
+
+    <!-- Hero End -->
+
+
+    <!-- Full Screen Search Start -->
+    <div class="modal fade" id="searchModal" tabindex="-1">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content" style="background: rgba(20, 24, 62, 0.7);">
+                <div class="modal-header border-0">
+                    <button type="button" class="btn btn-square bg-white btn-close" data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+                </div>
+                <div class="modal-body d-flex align-items-center justify-content-center">
+                    <div class="input-group" style="max-width: 600px;">
+                        <input type="text" class="form-control bg-transparent border-light p-3"
+                            placeholder="Type search keyword">
+                        <button class="btn btn-light px-4"><i class="bi bi-search"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Full Screen Search End -->
+
+
+    <!-- About Start -->
+    <div class="container-fluid py-1" id="about-section">
+        <div class="container">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-6 wow fadeIn" data-wow-delay="0.1s">
+                    <div class="about-img">
+                        <img class="img-fluid min-h" src="img/AI.jpg">
+                    </div>
+                </div>
+                <div class="col-lg-6 wow fadeIn" data-wow-delay="0.5s">
+    <div class="btn btn-sm border rounded-pill textg px-3 mb-3">About Us</div>
+    <h1 class="mb-4 textg">Empowering Businesses with Agentic AI and Comprehensive IT Solutions</h1>
+    <p class="mb-4">We specialize in delivering cutting-edge agentic AI solutions that enable autonomous decision-making and intelligent automation for your operations. Our expertise extends to custom AI application development, seamlessly integrating machine learning models to drive efficiency and innovation across industries.</p>
+    <p class="mb-4">Beyond AI, we offer a full spectrum of IT-related services, including robust website development, cloud infrastructure management, cybersecurity, and data analytics. Our holistic approach ensures your digital transformation is secure, scalable, and tailored to your unique needs.</p>
+    <div class="row g-3">
+        <div class="col-sm-6">
+            <h6 class="mb-3"><i class="fa fa-check text-primary me-2"></i>Award Winning</h6>
+            <h6 class="mb-0"><i class="fa fa-check text-primary me-2"></i>Expert Professional Team</h6>
+        </div>
+        <div class="col-sm-6">
+            <h6 class="mb-3"><i class="fa fa-check text-primary me-2"></i>24/7 Dedicated Support</h6>
+            <h6 class="mb-0"><i class="fa fa-check text-primary me-2"></i>Competitive and Transparent Pricing</h6>
+        </div>
+    </div>
+    <div class="d-flex align-items-center mt-4">
+        <a class="btn btn-primary rounded-pill px-4 me-3" href="">Read More</a>
+        <a class="btn btn-outline-primary btn-square me-3" href=""><i class="fab fa-facebook-f"></i></a>
+        <a class="btn btn-outline-primary btn-square me-3" href=""><i class="fab fa-twitter"></i></a>
+        <a class="btn btn-outline-primary btn-square me-3" href=""><i class="fab fa-instagram"></i></a>
+        <a class="btn btn-outline-primary btn-square" href=""><i class="fab fa-linkedin-in"></i></a>
+    </div>
+</div>
+            </div>
+        </div>
+    </div>
+    <!-- About End -->
+
+
+    <!-- Service Start -->
+   <div class="container-fluid bg-light mt-5 " id="services-section">
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-12 text-center wow fadeIn" data-wow-delay="0.1s">
+                <div class="btn btn-sm border rounded-pill text-primary px-3 mb-3">Our Services</div>
+                <h1 class="mb-4 textg">Comprehensive AI and IT Solutions Tailored for Your Business Growth</h1>
+                <p class="mb-4">We deliver innovative agentic AI solutions, advanced machine learning applications, and a full suite of IT services to transform your operations. From autonomous agents that handle complex tasks to custom web and app development, our expertise covers everything from cloud hosting to digital marketing strategies designed to boost efficiency, security, and scalability.</p>
+               
+            </div>
+        </div>
+        <div class="row g-4 mt-4">
+            <div class="col-md-4">
+                <div class="col-12 wow fadeIn" data-wow-delay="0.1s">
+                    <div class="service-item d-flex flex-column justify-content-center text-center rounded">
+                        <div class="service-icon btn-square">
+                            <i class="fa fa-robot fa-2x"></i>
+                        </div>
+                        <h5 class="mb-3">Agentic AI & Next-Gen Automation</h5>
+                        <p>Deploy autonomous AI agents that make real-time decisions, automate workflows, and integrate seamlessly with your systems for unparalleled efficiency and innovation.</p>
+                        <a class="btn px-3 mt-auto mx-auto" href="">Read More</a>
+                    </div>
+                </div>
+                <div class="col-12 wow fadeIn" data-wow-delay="0.3s" style="margin-top: 2rem;">
+                    <div class="service-item d-flex flex-column justify-content-center text-center rounded">
+                        <div class="service-icon btn-square">
+                            <i class="fa fa-brain fa-2x"></i>
+                        </div>
+                        <h5 class="mb-3">AI & Machine Learning Services</h5>
+                        <p>Build custom AI models, predictive analytics, and deep learning solutions to uncover insights, optimize processes, and drive data-driven decisions.</p>
+                        <br>
+                        <a class="btn px-3 mt-auto mx-auto" href="">Read More</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="col-12 wow fadeIn" data-wow-delay="0.5s">
+                    <div class="service-item d-flex flex-column justify-content-center text-center rounded">
+                        <div class="service-icon btn-square">
+                            <i class="fa fa-cloud fa-2x"></i>
+                        </div>
+                        <h5 class="mb-3">Hosting & Cloud Services</h5>
+                        <br>
+                        <p>Secure, scalable cloud infrastructure, hosting solutions, and migration services to ensure your applications run smoothly with high availability and performance.</p>
+                        <a class="btn px-3 mt-auto mx-auto" href="">Read More</a>
+                    </div>
+                </div>
+                <div class="col-12 wow fadeIn" data-wow-delay="0.7s" style="margin-top: 2rem;">
+                    <div class="service-item d-flex flex-column justify-content-center text-center rounded">
+                        <div class="service-icon btn-square">
+                            <i class="fa fa-shield-alt fa-2x"></i>
+                        </div>
+                        <h5 class="mb-3">IT Infrastructure & Security</h5>
+                        <br>
+                        <p>Design and manage robust IT networks, implement advanced cybersecurity measures, and ensure compliance to protect your data and infrastructure from threats.</p>
+                        <a class="btn px-3 mt-auto mx-auto" href="">Read More</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="col-12 wow fadeIn" data-wow-delay="0.9s">
+                    <div class="service-item d-flex flex-column justify-content-center text-center rounded">
+                        <div class="service-icon btn-square">
+                            <i class="fa fa-bullhorn fa-2x"></i>
+                        </div>
+                        <h5 class="mb-3">Digital Marketing</h5>
+                        <br>
+                        <p>AI-powered campaigns, SEO optimization, social media management, and analytics to enhance your online presence and engage customers effectively.</p>
+                        <a class="btn px-3 mt-auto mx-auto" href="">Read More</a>
+                    </div>
+                </div>
+                <div class="col-12 wow fadeIn" data-wow-delay="1.1s" style="margin-top: 2rem;">
+                    <div class="service-item d-flex flex-column justify-content-center text-center rounded">
+                        <div class="service-icon btn-square">
+                            <i class="fa fa-laptop-code fa-2x"></i>
+                        </div>
+                        <h5 class="mb-3">Web & App Development Services</h5>
+                        <p>Custom website and mobile app development using modern frameworks, ensuring responsive design, user-friendly interfaces, and robust backend integration.</p>
+                        <a class="btn px-3 mt-auto mx-auto" href="">Read More</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <!-- Service End -->
+
+
+   <!-- Feature Start -->
+<div class="container-fluid  feature ">
+    <div class="container pt-5">
+        <div class="row g-5">
+            <div class="col-lg-8 align-self-center  pb-md-5 wow fadeIn" data-wow-delay="0.3s">
+                <div class="btn btn-sm border rounded-pill text-white px-3 mb-3">Why Choose Us</div>
+                <h1 class="textg mb-4 ">We're Leaders in the AI Industry, Delivering Cutting-Edge Solutions</h1>
+                <p class="text-light mb-4">Our commitment to innovation drives us to provide top-tier agentic AI and IT services that empower businesses to thrive in a digital world. With a focus on customized solutions, we ensure seamless integration and exceptional results tailored to your needs.</p>
+                <div class="d-flex align-items-center text-white">
+                    <div class="btn-sm-square bg-white text-primary rounded-circle me-3">
+                        <i class="fa fa-check"></i>
+                    </div>
+                    <span>Innovative Agentic AI that automates complex tasks intelligently</span>
+                </div>
+                <div class="d-flex align-items-center text-white">
+                    <div class="btn-sm-square bg-white text-primary rounded-circle me-3">
+                        <i class="fa fa-check"></i>
+                    </div>
+                    <span>Custom AI application development for enhanced efficiency</span>
+                </div>
+                <div class="d-flex align-items-center text-white">
+                    <div class="btn-sm-square bg-white text-primary rounded-circle me-3">
+                        <i class="fa fa-check"></i>
+                    </div>
+                    <span>Comprehensive IT services including cloud management and cybersecurity</span>
+                </div>
+                <div class="d-flex align-items-center text-white">
+                    <div class="btn-sm-square bg-white text-primary rounded-circle me-3">
+                        <i class="fa fa-check"></i>
+                    </div>
+                    <span>Expert website and app development with modern, user-centric designs</span>
+                </div>
+                <div class="d-flex align-items-center text-white">
+                    <div class="btn-sm-square bg-white text-primary rounded-circle me-3">
+                        <i class="fa fa-check"></i>
+                    </div>
+                    <span>AI-powered digital marketing strategies to boost your online presence</span>
+                </div>
+                <div class="d-flex align-items-center text-white">
+                    <div class="btn-sm-square bg-white text-primary rounded-circle me-3">
+                        <i class="fa fa-check"></i>
+                    </div>
+                    <span>Scalable hosting and cloud services for reliable performance</span>
+                </div>
+                <div class="d-flex align-items-center text-white">
+                    <div class="btn-sm-square bg-white text-primary rounded-circle me-3">
+                        <i class="fa fa-check"></i>
+                    </div>
+                    <span>Advanced machine learning models for predictive analytics and insights</span>
+                </div>
+                <div class="d-flex align-items-center text-white">
+                    <div class="btn-sm-square bg-white text-primary rounded-circle me-3">
+                        <i class="fa fa-check"></i>
+                    </div>
+                    <span>Dedicated support team available around the clock</span>
+                </div>
+                <div class="d-flex align-items-center text-white">
+                    <div class="btn-sm-square bg-white text-primary rounded-circle me-3">
+                        <i class="fa fa-check"></i>
+                    </div>
+                    <span>Proven track record of driving business growth through technology</span>
+                </div>
+                <div class="d-flex align-items-center text-white">
+                    <div class="btn-sm-square bg-white text-primary rounded-circle me-3">
+                        <i class="fa fa-check"></i>
+                    </div>
+                    <span>Flexible solutions that adapt to your evolving business requirements</span>
+                </div>
+            </div>
+            <div class="col-lg-4 align-self-end text-center text-md-end wow fadeIn" data-wow-delay="0.5s">
+                <img class="img-fluid" src="img/feature.png" alt="">
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Feature End -->
+
+
+  <!-- Blog Start -->
+<div class="container-fluid bg-light py-2">
+    <div class="container py-5">
+        <div class="mx-auto text-center wow fadeIn" data-wow-delay="0.1s" >
+            <div class="btn btn-sm border rounded-pill text-primary px-3 mb-3">Blog</div>
+            <h1 class="mb-4 textg">Explore Our Recent AI Insights</h1>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-4 wow fadeIn" data-wow-delay="0.3s">
+                <div class="case-item position-relative overflow-hidden rounded mb-2">
+                    <img class="img-fluid" src="img/Blog_1.jpg" alt="">
+                    <a class="case-overlay text-decoration-none" href="">
+                        <small>The Rise of Agentic AI</small>
+                        <h5 class="lh-base text-white mb-3">How autonomous AI agents are transforming business operations with real-time decision-making and automation</h5>
+                        <span class="btn btn-square btn-primary"><i class="fa fa-arrow-right"></i></span>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 wow fadeIn" data-wow-delay="0.5s">
+                <div class="case-item position-relative overflow-hidden rounded mb-2">
+                    <img class="img-fluid" src="img/project-2.jpg" alt="">
+                    <a class="case-overlay text-decoration-none" href="">
+                        <small>Advancements in Machine Learning</small>
+                        <h5 class="lh-base text-white mb-3">Leveraging custom ML models to drive predictive analytics and enhance data-driven strategies in modern enterprises</h5>
+                        <span class="btn btn-square btn-primary"><i class="fa fa-arrow-right"></i></span>
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 wow fadeIn" data-wow-delay="0.7s">
+                <div class="case-item position-relative overflow-hidden rounded mb-2">
+                    <img class="img-fluid" src="img/project-3.jpg" alt="">
+                    <a class="case-overlay text-decoration-none" href="">
+                        <small>AI in Digital Transformation</small>
+                        <h5 class="lh-base text-white mb-3">Integrating AI with cloud services and security to build scalable, intelligent IT infrastructures for the future</h5>
+                        <span class="btn btn-square btn-primary"><i class="fa fa-arrow-right"></i></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Blog End -->
+
+
+   <!-- FAQs Start -->
+<div class="container-fluid py-2">
+    <div class="container py-3">
+        <div class="mx-auto text-center wow fadeIn" data-wow-delay="0.1s" >
+            <div class="btn btn-sm border rounded-pill text-primary px-3 mb-3">Popular FAQs</div>
+            <h1 class="mb-4 textg">Frequently Asked Questions About Our AI and IT Services</h1>
+        </div>
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="accordion" id="accordionFAQ1">
+                    <div class="accordion-item wow fadeIn" data-wow-delay="0.1s">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                What is Agentic AI and how can it benefit my business?
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne"
+                            data-bs-parent="#accordionFAQ1">
+                            <div class="accordion-body">
+                                Agentic AI refers to autonomous AI systems that can perceive their environment, make decisions, and take actions to achieve specific goals without constant human intervention. It benefits businesses by automating complex workflows, improving efficiency, reducing operational costs, and enabling real-time adaptability in areas like customer service, supply chain management, and data analysis.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item wow fadeIn" data-wow-delay="0.2s">
+                        <h2 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                How do your AI and Machine Learning services integrate with existing IT infrastructure?
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
+                            data-bs-parent="#accordionFAQ1">
+                            <div class="accordion-body">
+                                Our AI and ML services are designed for seamless integration using APIs, microservices, and cloud-native architectures. We assess your current setup, ensure compatibility with tools like AWS, Azure, or on-premises systems, and provide custom solutions that enhance rather than disrupt your operations, including like adding predictive analytics to your CRM or automating processes via agentic agents.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item wow fadeIn" data-wow-delay="0.3s">
+                        <h2 class="accordion-header" id="headingThree">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                What security measures do you implement in your IT Infrastructure & Security services?
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
+                            data-bs-parent="#accordionFAQ1">
+                            <div class="accordion-body">
+                                We employ multi-layered security including encryption, firewalls, intrusion detection systems, regular vulnerability assessments, and compliance with standards like GDPR and ISO 27001. For AI deployments, we add data anonymization and secure model training to protect sensitive information while maintaining high performance and scalability.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item wow켜 fadeIn" data-wow-delay="0.4s">
+                        <h2 class="accordion-header" id="headingFour">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                How long does it take to develop and deploy a custom Web or App solution?
+                            </button>
+                        </h2>
+                        <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour"
+                            data-bs-parent="#accordionFAQ1">
+                            <div class="accordion-body">
+                                Development timelines vary by complexity, but simple projects can be ready in 4-6 weeks, while enterprise-level apps with AI integration may take 3-6 months. We use agile methodologies for faster iterations, including prototyping, testing, and deployment phases to ensure quick launches and ongoing optimizations.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="accordion" id="accordionFAQ2">
+                    <div class="accordion-item wow fadeIn" data-wow-delay="0.5s">
+                        <h2 class="accordion-header" id="headingFive">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                                Can your Hosting & Cloud Services handle high-traffic AI applications?
+                            </button>
+                        </h2>
+                        <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive"
+                            data-bs-parent="#accordionFAQ2">
+                            <div class="accordion-body">
+                                Yes, our cloud services are built on scalable platforms like AWS, Google Cloud, and Azure, supporting auto-scaling, load balancing, and GPU acceleration for AI workloads. We optimize for high availability (99.9% uptime), cost-efficiency, and seamless migration to handle traffic spikes without downtime.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item wow fadeIn" data-wow-delay="0.6s">
+                        <h2 class="accordion-header" id="headingSix">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+                                How does your Digital Marketing incorporate AI for better results?
+                            </button>
+                        </h2>
+                        <div id="collapseSix" class="accordion-collapse collapse" aria-labelledby="headingSix"
+                            data-bs-parent="#accordionFAQ2">
+                            <div class="accordion-body">
+                                We use AI for personalized campaigns, predictive audience targeting, sentiment analysis, and automated content optimization. Tools like ML-driven SEO and chatbots improve engagement rates by up to 30%, providing data-backed insights to refine strategies and maximize ROI across channels like social media and email.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item wow fadeIn" data-wow-delay="0.7s">
+                        <h2 class="accordion-header" id="headingSeventh">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseSeven" aria-expanded="false" aria-controls="collapseSeven">
+                                What is the difference between traditional automation and Agentic AI automation?
+                            </button>
+                        </h2>
+                        <div id="collapseSeven" class="accordion-collapse collapse" aria-labelledby="headingSeven"
+                            data-bs-parent="#accordionFAQ2">
+                            <div class="accordion-body">
+                                Traditional automation follows predefined rules, while Agentic AI uses learning algorithms to adapt dynamically, handle unstructured data, and pursue goals independently. This leads to smarter, more resilient systems that evolve with your business needs, reducing manual oversight and enabling innovation in complex scenarios.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item wow fadeIn" data-wow-delay="0.8s">
+                        <h2 class="accordion-header" id="headingEight">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseEight" aria-expanded="false" aria-controls="collapseEight">
+                                Do you offer ongoing support and maintenance for deployed AI solutions?
+                            </button>
+                        </h2>
+                        <div id="collapseEight" class="accordion-collapse collapse" aria-labelledby="headingEight"
+                            data-bs-parent="#accordionFAQ2">
+                            <div class="accordion-body">
+                                Absolutely, we provide 24/7 monitoring, model retraining, performance tuning, and updates through dedicated support plans. Our team ensures your AI systems stay accurate, secure, and aligned with evolving business requirements, including proactive issue resolution and scalability enhancements.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- FAQs End -->
+
+
+    <!-- Team Start -->
+    <!-- <div class="container-fluid bg-light py-5">
+        <div class="container py-5">
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-5 wow fadeIn" data-wow-delay="0.1s">
+                    <div class="btn btn-sm border rounded-pill text-primary px-3 mb-3">Our Team</div>
+                    <h1 class="mb-4">Meet Our Experienced Team Members</h1>
+                    <p class="mb-4">Tempor erat elitr rebum at clita. Diam dolor diam ipsum et tempor sit. Aliqu diam
+                        amet diam et eos labore. Clita erat ipsum et lorem et sit, sed stet no labore lorem sit. Sanctus
+                        clita duo justo et tempor eirmod magna dolore erat amet</p>
+                    <a class="btn btn-primary rounded-pill px-4" href="">Read More</a>
+                </div>
+                <div class="col-lg-7">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="row g-4">
+                                <div class="col-12 wow fadeIn" data-wow-delay="0.1s">
+                                    <div class="team-item bg-white text-center rounded p-4 pt-0">
+                                        <img class="img-fluid rounded-circle p-4" src="img/team-1.jpg" alt="">
+                                        <h5 class="mb-0">Boris Johnson</h5>
+                                        <small>Founder & CEO</small>
+                                        <div class="d-flex justify-content-center mt-3">
+                                            <a class="btn btn-square btn-primary m-1" href=""><i
+                                                    class="fab fa-facebook-f"></i></a>
+                                            <a class="btn btn-square btn-primary m-1" href=""><i
+                                                    class="fab fa-twitter"></i></a>
+                                            <a class="btn btn-square btn-primary m-1" href=""><i
+                                                    class="fab fa-instagram"></i></a>
+                                            <a class="btn btn-square btn-primary m-1" href=""><i
+                                                    class="fab fa-linkedin-in"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 wow fadeIn" data-wow-delay="0.5s">
+                                    <div class="team-item bg-white text-center rounded p-4 pt-0">
+                                        <img class="img-fluid rounded-circle p-4" src="img/team-2.jpg" alt="">
+                                        <h5 class="mb-0">Adam Crew</h5>
+                                        <small>Executive Manager</small>
+                                        <div class="d-flex justify-content-center mt-3">
+                                            <a class="btn btn-square btn-primary m-1" href=""><i
+                                                    class="fab fa-facebook-f"></i></a>
+                                            <a class="btn btn-square btn-primary m-1" href=""><i
+                                                    class="fab fa-twitter"></i></a>
+                                            <a class="btn btn-square btn-primary m-1" href=""><i
+                                                    class="fab fa-instagram"></i></a>
+                                            <a class="btn btn-square btn-primary m-1" href=""><i
+                                                    class="fab fa-linkedin-in"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 pt-md-4">
+                            <div class="row g-4">
+                                <div class="col-12 wow fadeIn" data-wow-delay="0.3s">
+                                    <div class="team-item bg-white text-center rounded p-4 pt-0">
+                                        <img class="img-fluid rounded-circle p-4" src="img/team-3.jpg" alt="">
+                                        <h5 class="mb-0">Kate Winslet</h5>
+                                        <small>Co Founder</small>
+                                        <div class="d-flex justify-content-center mt-3">
+                                            <a class="btn btn-square btn-primary m-1" href=""><i
+                                                    class="fab fa-facebook-f"></i></a>
+                                            <a class="btn btn-square btn-primary m-1" href=""><i
+                                                    class="fab fa-twitter"></i></a>
+                                            <a class="btn btn-square btn-primary m-1" href=""><i
+                                                    class="fab fa-instagram"></i></a>
+                                            <a class="btn btn-square btn-primary m-1" href=""><i
+                                                    class="fab fa-linkedin-in"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-12 wow fadeIn" data-wow-delay="0.7s">
+                                    <div class="team-item bg-white text-center rounded p-4 pt-0">
+                                        <img class="img-fluid rounded-circle p-4" src="img/team-4.jpg" alt="">
+                                        <h5 class="mb-0">Cody Gardner</h5>
+                                        <small>Project Manager</small>
+                                        <div class="d-flex justify-content-center mt-3">
+                                            <a class="btn btn-square btn-primary m-1" href=""><i
+                                                    class="fab fa-facebook-f"></i></a>
+                                            <a class="btn btn-square btn-primary m-1" href=""><i
+                                                    class="fab fa-twitter"></i></a>
+                                            <a class="btn btn-square btn-primary m-1" href=""><i
+                                                    class="fab fa-instagram"></i></a>
+                                            <a class="btn btn-square btn-primary m-1" href=""><i
+                                                    class="fab fa-linkedin-in"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> -->
+    <!-- Team End -->
+
+
+    <!-- Testimonial Start -->
+   <div class="container-xxl py-2">
+    <div class="container py-5">
+        <div class="row g-5">
+            <div class="col-lg-5 wow fadeIn" data-wow-delay="0.1s">
+                <div class="btn btn-sm border rounded-pill text-primary px-3 mb-3">Testimonial</div>
+                <h1 class="mb-4 textg">What Say Our Clients!</h1>
+                <p class="mb-4">Discover how our agentic AI solutions, custom IT services, and innovative digital transformations have empowered businesses worldwide. Our clients praise the seamless integration, enhanced efficiency, and measurable ROI delivered through our expert team.</p>
+                <!-- <a class="btn btn-primary rounded-pill px-4" href="">Read More</a> -->
+            </div>
+            <div class="col-lg-7 wow fadeIn" data-wow-delay="0.5s">
+                <div class="owl-carousel testimonial-carousel border-start border-primary">
+                    <div class="testimonial-item ps-5">
+                        <i class="fa fa-quote-left fa-2x text-primary mb-3"></i>
+                        <p class="fs-4">The agentic AI implementation revolutionized our operations, automating complex decisions and boosting productivity by 40%. Exceptional service and ongoing support!</p>
+                        <div class="d-flex align-items-center">
+                            <img class="img-fluid flex-shrink-0 rounded-circle" src="img/testimonial-1.jpg"
+                                style="width: 60px; height: 60px;">
+                            <div class="ps-3">
+                                <h5 class="mb-1">Ally Albert</h5>
+                                <!-- <span>CEO, Tech Innovators Inc.</span> -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial-item ps-5">
+                        <i class="fa fa-quote-left fa-2x text-primary mb-3"></i>
+                        <p class="fs-4">Their custom machine learning models provided predictive insights that transformed our data strategy. Secure, scalable, and delivered ahead of schedule.</p>
+                        <div class="d-flex align-items-center">
+                            <img class="img-fluid flex-shrink-0 rounded-circle" src="img/testimonial-2.jpg"
+                                style="width: 60px; height: 60px;">
+                            <div class="ps-3">
+                                <h5 class="mb-1">Rajesh Kumar</h5>
+                                <!-- <span>CTO, Mumbai Digital Solutions</span> -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="testimonial-item ps-5">
+                        <i class="fa fa-quote-left fa-2x text-primary mb-3"></i>
+                        <p class="fs-4">Outstanding web and app development combined with cloud hosting made our digital transformation effortless. AI-driven marketing doubled our engagement rates!</p>
+                        <div class="d-flex align-items-center">
+                            <img class="img-fluid flex-shrink-0 rounded-circle" src="img/testimonial-3.jpg"
+                                style="width: 60px; height: 60px;">
+                            <div class="ps-3">
+                                <h5 class="mb-1">Elena Rodriguez</h5>
+                                <!-- <span>Marketing Director, Global Enterprises</span> -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <!-- Testimonial End -->
+
+
+    <!-- Newsletter Start -->
+    <!-- <div class="container-fluid bg-primaries newsletter py-5">
+        <div class="container">
+            <div class="row g-5 align-items-center">
+                <div class="col-md-5 ps-lg-0 pt-5 pt-md-0 text-start wow fadeIn" data-wow-delay="0.3s">
+                    <img class="img-fluid" src="img/newsletter.png" alt="">
+                </div>
+                <div class="col-md-7 py-5 newsletter-text wow fadeIn" data-wow-delay="0.5s">
+                    <div class="btn btn-sm border rounded-pill text-white px-3 mb-3">Newsletter</div>
+                    <h1 class="text-white mb-4">Let's subscribe the newsletter</h1>
+                    <div class="position-relative w-100 mt-3 mb-2">
+                        <input class="form-control border-0 rounded-pill w-100 ps-4 pe-5" type="text"
+                            placeholder="Enter Your Email" style="height: 48px;">
+                        <button type="button" class="btn shadow-none position-absolute top-0 end-0 mt-1 me-2"><i
+                                class="fa fa-paper-plane text-primary fs-4"></i></button>
+                    </div>
+                    <small class="text-white-50">Diam sed sed dolor stet amet eirmod</small>
+                </div>
+            </div>
+        </div>
+    </div> -->
+    <!-- Newsletter End -->
+
+
+    <!-- Footer Start -->
+   <div class="container-fluid bg-dark text-white-50 footer pt-2">
+    <div class="container py-5">
+        <div class="row g-5">
+            <div class="col-md-6 col-lg-6 wow fadeIn" data-wow-delay="0.1s">
+                <a href="index.html" class="d-inline-block mb-3">
+                    <h1 class="text-white">VRInfoTech</h1>
+                </a>
+                <p class="mb-0">We are a leading provider of agentic AI solutions and comprehensive IT services, empowering businesses with autonomous intelligence, custom applications, secure infrastructure, and digital innovation. Our mission is to drive your success through cutting-edge technology tailored to your needs.</p>
+            </div>
+            <div class="col-md-6 col-lg-3 wow fadeIn" data-wow-delay="0.3s">
+                <h5 class="text-white mb-4">Get In Touch</h5>
+                <p><i class="fa fa-map-marker-alt me-3"></i>Pune, India</p>
+                 <p><i class="fa fa-phone-alt me-3"></i>+91 7796390239</p>
+                <p><i class="fa fa-envelope me-3"></i>vrinfotech39@gmail.com</p>
+                <div class="d-flex pt-2">
+                    <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-twitter"></i></a>
+                    <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-facebook-f"></i></a>
+                    <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-youtube"></i></a>
+                    <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-instagram"></i></a>
+                    <a class="btn btn-outline-light btn-social" href=""><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 wow fadeIn" data-wow-delay="0.5s">
+                <h5 class="text-white mb-4">Quick Links</h5>
+                <a class="btn btn-link" href="">About Us</a>
+                <a class="btn btn-link" href="">Contact Us</a>
+                <a class="btn btn-link" href="">Our Services</a>
+                <a class="btn btn-link" href="">Privacy Policy</a>
+                <a class="btn btn-link" href="">Terms & Conditions</a>
+            </div>
+            <!-- <div class="col-md-6 col-lg-3 wow fadeIn" data-wow-delay="0.7s">
+                <h5 class="text-white mb-4">Our Services Services</h5>
+                <a class="btn btn-link" href="">Agentic AI & Automation</a>
+                <a class="btn btn-link" href="">AI & Machine Learning</a>
+                <a class="btn btn-link" href="">Web & App Development</a>
+                <a class="btn btn-link" href="">Hosting & Cloud Services</a>
+                <a class="btn btn-link" href="">Digital Marketing</a>
+                <a class="btn btn-link" href="">IT Infrastructure & Security</a>
+            </div> -->
+        </div>
+    </div>
+    <div class="container wow fadeIn" data-wow-delay="0.1s">
+        <div class="copyright">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                    &copy; <a class="border-bottom" href="https://www.vrinfotech.org/">VRInfoTech</a>, All Rights Reserved.
+
+                    <!--/*** This template is free as long as you keep the footer author’s credit link/attribution link/backlink. If you'd like to use the template without the footer author’s credit link/attribution link/backlink, you can purchase the Credit Removal License from "https://htmlcodex.com/credit-removal". Thank you for your support. ***/-->
+                    <!-- Designed By <a class="border-bottom" href="https://htmlcodex.com">HTML Codex</a> -->
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <div class="footer-menu">
+                        <a href="">Home</a>
+                        <a href="">Cookies</a>
+                        <a href="">Help</a>
+                        <a href="">FAQs</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    <!-- Footer End -->
+
+
+    <!-- Back to Top -->
+    <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top pt-2"><i class="bi bi-arrow-up"></i></a>
+
+
+    <!-- JavaScript Libraries -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="lib/wow/wow.min.js"></script>
+    <script src="lib/easing/easing.min.js"></script>
+    <script src="lib/waypoints/waypoints.min.js"></script>
+    <script src="lib/counterup/counterup.min.js"></script>
+    <script src="lib/owlcarousel/owl.carousel.min.js"></script>
+
+    <!-- Template Javascript -->
+    <script src="js/main.js"></script>
 </body>
 
 </html>
