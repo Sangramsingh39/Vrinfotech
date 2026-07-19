@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trending Insights | VR Info Tech | Real-world Tech Solutions</title>
+  <meta name="description" content="Explore real-world trending topics on small business websites, outbound AI calling agents, and automated invoice data entry pipelines.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  
+  <!-- AOS Animation CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+  
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/style.css">
+  
+  <style>
+    .article-content-panel {
+      display: none;
+    }
+    .article-content-panel.active {
+      display: block;
+    }
+    .article-nav-btn {
+      transition: var(--transition-smooth);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.02);
+      color: var(--color-text-main) !important;
+      text-align: left;
+    }
+    .article-nav-btn.active {
+      border-color: var(--color-primary) !important;
+      background: rgba(56, 189, 248, 0.05) !important;
+      color: var(--color-primary) !important;
+    }
+    .article-body-text {
+      line-height: 1.8;
+      color: var(--color-text-muted);
+      font-size: 1.05rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Animated Background Glow Orbs -->
+  <div class="bg-grid"></div>
+  <div class="glow-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- Premium Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top navbar-premium">
+    <div class="container">
+      <a class="navbar-brand navbar-brand-premium" href="index.html">
+        <div class="logo-icon">
+          <i class="bi bi-cpu"></i>
+        </div>
+        <span>VR INFO TECH</span>
+      </a>
+      <button class="navbar-toggler navbar-toggler-premium" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNavbar">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
+          <li class="nav-item">
+            <a class="nav-link nav-link-premium" href="index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-link-premium" href="about.html">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-link-premium" href="services.html">Services</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-link-premium" href="portfolio.html">Portfolio</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-link-premium" href="pricing.html">Pricing</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-link-premium active" href="trending.html">Trending</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-link-premium" href="contact.html">Contact</a>
+          </li>
+          <li class="nav-item ms-lg-3 mt-3 mt-lg-0">
+            <a class="btn-premium py-2 px-4" href="contact.html">Get Free Audit</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page Header -->
+  <header class="section-wrapper text-center pt-5 mt-5">
+    <div class="container">
+      <div data-aos="fade-up">
+        <span class="section-badge"><i class="bi bi-journal-text"></i> Trending Insights</span>
+        <h1 class="section-title">Real-world Tech & <span class="gradient-text">Automation Guides</span></h1>
+        <p class="section-subtitle">Read actionable engineering strategies and growth insights compiled directly by our systems team.</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Interactive Split Reader Section -->
+  <section class="section-wrapper pt-0">
+    <div class="container">
+      <div class="row g-5">
+        
+        <!-- Sidebar: List of Articles -->
+        <div class="col-lg-4" data-aos="fade-right">
+          <div class="glass-card p-4">
+            <h3 class="h5 fw-bold font-display text-white mb-4">Trending Articles</h3>
+            <div class="d-flex flex-column gap-3">
+              
+              <!-- Nav Button 1 -->
+              <button onclick="switchArticle('local-web')" id="btn-art-local-web" class="btn article-nav-btn active p-3 w-100 rounded-3">
+                <div class="small color-text-dark mb-1">Local Business Growth</div>
+                <h4 class="h6 fw-bold mb-0">Boosting Local Traffic: The Web Storefront Blueprint</h4>
+              </button>
+
+              <!-- Nav Button 2 -->
+              <button onclick="switchArticle('ai-voice')" id="btn-art-ai-voice" class="btn article-nav-btn p-3 w-100 rounded-3">
+                <div class="small color-text-dark mb-1">AI Calling Systems</div>
+                <h4 class="h6 fw-bold mb-0">Voice Calling Agents: The Future of Outbound Sales</h4>
+              </button>
+
+              <!-- Nav Button 3 -->
+              <button onclick="switchArticle('excel-ai')" id="btn-art-excel-ai" class="btn article-nav-btn p-3 w-100 rounded-3">
+                <div class="small color-text-dark mb-1">Office Automation</div>
+                <h4 class="h6 fw-bold mb-0">From Excel to LLM Pipelines: Invoice Processing</h4>
+              </button>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Main Display Panel: Selected Full Article -->
+        <div class="col-lg-8" data-aos="fade-left">
+          <div class="glass-card p-5 h-100">
+            
+            <!-- Article 1 Content -->
+            <div id="article-local-web" class="article-content-panel active">
+              <span class="badge bg-primary px-3 py-1.5 uppercase fs-8 mb-3">Small Business Web</span>
+              <h2 class="h3 fw-extrabold font-display text-white mb-2">Boosting Local Traffic: The Web Storefront Blueprint</h2>
+              <div class="small color-text-dark mb-4">Written by Pune Local Tech Team | 6 Min Read</div>
+              
+              <div class="choose-img-card mb-4" style="height: 250px;">
+                <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=800&auto=format&fit=crop" class="w-100 h-100 object-fit-cover" alt="Small local business digital representation">
+              </div>
+
+              <div class="article-body-text">
+                <p class="mb-4">
+                  For small local businesses from FC Road to Kothrud, having a digital presence is no longer optional. A responsive, mobile-first website acts as your virtual storefront. Cafe and restaurant owners can display interactive digital menus that load instantly on mobile networks, preventing visitor bounce.
+                </p>
+                <p class="mb-4">
+                  Photographers can showcase high-definition galleries using lazy-loading tech to display portfolios without slowing down page load. For antique and art sellers, a simple product gallery with WhatsApp integration lets local customers browse pieces and initiate purchases directly.
+                </p>
+                <p class="mb-0">
+                  Combining these fast web structures with Google Maps (Local SEO) pins your business on local search queries, driving real-world foot traffic to your physical store.
+                </p>
+              </div>
+            </div>
+
+            <!-- Article 2 Content -->
+            <div id="article-ai-voice" class="article-content-panel">
+              <span class="badge bg-info px-3 py-1.5 uppercase fs-8 mb-3 text-dark">AI & Automation</span>
+              <h2 class="h3 fw-extrabold font-display text-white mb-2">Voice Calling Agents: The Future of Outbound Sales</h2>
+              <div class="small color-text-dark mb-4">Written by AI Research Lab | 8 Min Read</div>
+
+              <div class="choose-img-card mb-4" style="height: 250px;">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=800&auto=format&fit=crop" class="w-100 h-100 object-fit-cover" alt="Call agent technology simulation">
+              </div>
+
+              <div class="article-body-text">
+                <p class="mb-4">
+                  Outbound lead generation has historically been a labor-intensive operation. Standard dialers require humans to spend hours placing calls, handling repetitive questions, and manually entering results. AI voice calling agents represent a major shift.
+                </p>
+                <p class="mb-4">
+                  Built using natural language understanding (NLU) and low-latency speech synthesis, these bots speak to prospects in real-time. They can qualify leads (e.g. asking a home buyer their budget and location preferences), schedule site visits, and advertise seasonal discounts.
+                </p>
+                <p class="mb-0">
+                  Because they process calls concurrently, they can dial thousands of prospects in minutes, pre-filtering interested leads and sending qualified details straight to your sales team's CRM.
+                </p>
+              </div>
+            </div>
+
+            <!-- Article 3 Content -->
+            <div id="article-excel-ai" class="article-content-panel">
+              <span class="badge bg-purple px-3 py-1.5 uppercase fs-8 mb-3">Enterprise Systems</span>
+              <h2 class="h3 fw-extrabold font-display text-white mb-2">From Excel to LLM Pipelines: Invoice Processing</h2>
+              <div class="small color-text-dark mb-4">Written by Systems Engineering Dept | 7 Min Read</div>
+
+              <div class="choose-img-card mb-4" style="height: 250px;">
+                <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop" class="w-100 h-100 object-fit-cover" alt="Industrial database automation chart">
+              </div>
+
+              <div class="article-body-text">
+                <p class="mb-4">
+                  Manufacturing and logistics firms in industrial zones like Chakan and Bhosari MIDC process hundreds of vendor invoices weekly. In many offices, this data entry is still manual: staff read emails, open PDFs, and manually copy invoice numbers, dates, and amounts into Excel files. This process is slow and prone to human error.
+                </p>
+                <p class="mb-4">
+                  By deploying an AI-driven invoice extraction pipeline, we automate the complete cycle. An AI model scans incoming emails, extracts invoice files, runs optical character recognition (OCR) to parse fields, classifies the line items, and logs them directly into a database or ERP system.
+                </p>
+                <p class="mb-0">
+                  Staff only need to review flagged anomalies, reducing administrative overhead by up to 80% and ensuring perfect logging accuracy.
+                </p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Premium Footer -->
+  <footer class="footer-premium">
+    <div class="container">
+      <div class="row g-5">
+        <div class="col-lg-4 col-md-6">
+          <div class="navbar-brand-premium mb-4">
+            <div class="footer-logo-icon">
+              <i class="bi bi-cpu"></i>
+            </div>
+            <span class="fs-4 fw-bold">VR INFO TECH</span>
+          </div>
+          <p class="color-text-muted small mb-4">Engineering high-availability software products, fine-tuned artificial intelligence integrations, and performance-driven growth solutions.</p>
+          <div class="footer-newsletter">
+            <div class="footer-title">Newsletter</div>
+            <form class="footer-newsletter-form d-flex">
+              <input type="email" class="form-control" placeholder="Work email" required aria-label="Work email">
+              <button class="btn-newsletter" type="submit"><i class="bi bi-arrow-right"></i></button>
+            </form>
+          </div>
+        </div>
+
+        <div class="col-lg-2 col-md-6 col-6">
+          <div class="footer-title">Navigation</div>
+          <ul class="footer-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About Company</a></li>
+            <li><a href="services.html">Our Services</a></li>
+            <li><a href="portfolio.html">Case Studies</a></li>
+            <li><a href="contact.html">Connect With Us</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-2 col-md-6 col-6">
+          <div class="footer-title">Capabilities</div>
+          <ul class="footer-links">
+            <li><a href="services.html">AI Automation</a></li>
+            <li><a href="services.html">Next.js Frameworks</a></li>
+            <li><a href="services.html">Cloud Architecture</a></li>
+            <li><a href="services.html">CI/CD DevOps</a></li>
+            <li><a href="services.html">Growth SEO</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+          <div class="footer-title">Support Hub</div>
+          <p class="color-text-muted small mb-2"><i class="bi bi-telephone text-primary me-2"></i> Support: +91-7796390239</p>
+          <p class="color-text-muted small mb-2"><i class="bi bi-envelope text-primary me-2"></i> Inquiry: vrinfotech39@gmail.com</p>
+          <p class="color-text-muted small mb-4"><i class="bi bi-geo-alt text-primary me-2"></i> HQ: Pune, Maharashtra, India</p>
+          <div class="social-icons-row">
+            <a href="#" class="social-icon-btn"><i class="bi bi-linkedin"></i></a>
+            <a href="#" class="social-icon-btn"><i class="bi bi-twitter-x"></i></a>
+            <a href="#" class="social-icon-btn"><i class="bi bi-github"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+        <div class="footer-bottom-text">
+          &copy; 2026 VR Info Tech. All rights reserved. Built with premium assets.
+        </div>
+        <div class="footer-bottom-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms & Conditions</a>
+          <a href="#">Sitemap</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- AOS Scroll Animation JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <!-- Custom Logic -->
+  <script src="js/main.js"></script>
+  
+  <script>
+    function switchArticle(articleKey) {
+      // Hide all article panels
+      const panels = document.querySelectorAll('.article-content-panel');
+      panels.forEach(p => p.classList.remove('active'));
+
+      // Show selected panel
+      const activePanel = document.getElementById('article-' + articleKey);
+      if (activePanel) {
+        activePanel.classList.add('active');
+      }
+
+      // Toggle active state in sidebar buttons
+      const buttons = document.querySelectorAll('[id^="btn-art-"]');
+      buttons.forEach(btn => {
+        btn.classList.remove('active');
+      });
+
+      const activeBtn = document.getElementById('btn-art-' + articleKey);
+      if (activeBtn) {
+        activeBtn.classList.add('active');
+      }
+    }
+  </script>
+</body>
+</html>

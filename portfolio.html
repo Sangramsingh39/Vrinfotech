@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio | VR Info Tech | Enterprise Deployments</title>
+  <meta name="description" content="Browse VR Info Tech's portfolio of recent AI modeling, high-availability cloud migrations, and custom enterprise dashboard platforms.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  
+  <!-- AOS Animation CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+  
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Animated Background Glow Orbs -->
+  <div class="bg-grid"></div>
+  <div class="glow-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- Premium Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top navbar-premium">
+    <div class="container">
+      <a class="navbar-brand navbar-brand-premium" href="index.html">
+        <div class="logo-icon">
+          <i class="bi bi-cpu"></i>
+        </div>
+        <span>VR INFO TECH</span>
+      </a>
+      <button class="navbar-toggler navbar-toggler-premium" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNavbar">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
+          <li class="nav-item">
+            <a class="nav-link nav-link-premium" href="index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-link-premium" href="about.html">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-link-premium" href="services.html">Services</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-link-premium active" href="portfolio.html">Portfolio</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-link-premium" href="pricing.html">Pricing</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-link-premium" href="trending.html">Trending</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-link-premium" href="contact.html">Contact</a>
+          </li>
+          <li class="nav-item ms-lg-3 mt-3 mt-lg-0">
+            <a class="btn-premium py-2 px-4" href="contact.html">Get Free Audit</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Page Header -->
+  <header class="section-wrapper text-center pt-5 mt-5">
+    <div class="container">
+      <div data-aos="fade-up">
+        <span class="section-badge"><i class="bi bi-folder2-open"></i> Projects Archive</span>
+        <h1 class="section-title">Case Studies & <span class="gradient-text">Recent Deployments</span></h1>
+        <p class="section-subtitle">A collection of custom web application backends, cloud-native storage nodes, and fine-tuned predictive machine learning models.</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Portfolio Grid Section -->
+  <section class="section-wrapper pt-0">
+    <div class="container">
+      <!-- Filter Tabs -->
+      <div class="tech-tabs mb-5" data-aos="fade-up">
+        <button class="tech-tab-btn active" data-category="all">All Projects</button>
+        <button class="tech-tab-btn" data-category="ai">AI Systems</button>
+        <button class="tech-tab-btn" data-category="cloud">Cloud Migration</button>
+        <button class="tech-tab-btn" data-category="web">Web Applications</button>
+      </div>
+
+      <div class="row g-4" data-aos="fade-up">
+        <!-- Project 1: AI auditor -->
+        <div class="col-md-4 filter-item text-start overflow-hidden" data-category="ai" style="display: flex; flex-direction: column;">
+          <div class="portfolio-card h-100">
+            <div class="portfolio-img-container">
+              <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=600&auto=format&fit=crop" alt="AI Financial Auditor Dashboard Screen">
+              <span class="portfolio-badge">AI Solutions</span>
+            </div>
+            <div class="portfolio-card-content">
+              <h3 class="portfolio-title">AI Financial Auditor</h3>
+              <p class="portfolio-desc">Engineered an AI auditor to analyze ledger anomalies for a financial group, shrinking transaction errors by 88%.</p>
+              <div class="d-flex align-items-center justify-content-between mt-3 pt-3 border-top border-secondary">
+                <span class="small color-text-muted fw-bold"><i class="bi bi-graph-down text-primary"></i> 88% Error Drop</span>
+                <a href="case-studies.html?project=ai-auditor" class="btn-premium-outline py-1.5 px-3 fs-7">Read Case Study</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project 2: AWS Migration -->
+        <div class="col-md-4 filter-item text-start overflow-hidden" data-category="cloud" style="display: flex; flex-direction: column;">
+          <div class="portfolio-card h-100">
+            <div class="portfolio-img-container">
+              <img src="https://images.unsplash.com/photo-1544383835-bda2bc66a55d?q=80&w=600&auto=format&fit=crop" alt="Cloud Infrastructure Server Stacks">
+              <span class="portfolio-badge">Cloud Migration</span>
+            </div>
+            <div class="portfolio-card-content">
+              <h3 class="portfolio-title">Retail Cloud Migration</h3>
+              <p class="portfolio-desc">Migrated 40+ on-premise inventory systems to AWS, boosting uptime stability to 99.99% under heavy scaling loads.</p>
+              <div class="d-flex align-items-center justify-content-between mt-3 pt-3 border-top border-secondary">
+                <span class="small color-text-muted fw-bold"><i class="bi bi-clock-history text-purple"></i> 99.99% SLA Uptime</span>
+                <a href="case-studies.html?project=cloud-migration" class="btn-premium-outline py-1.5 px-3 fs-7">Read Case Study</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project 3: SaaS Analytics -->
+        <div class="col-md-4 filter-item text-start overflow-hidden" data-category="web" style="display: flex; flex-direction: column;">
+          <div class="portfolio-card h-100">
+            <div class="portfolio-img-container">
+              <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=600&auto=format&fit=crop" alt="Telemetry Platform User Interface Screen">
+              <span class="portfolio-badge">Web Application</span>
+            </div>
+            <div class="portfolio-card-content">
+              <h3 class="portfolio-title">SaaS Analytics Platform</h3>
+              <p class="portfolio-desc">Engineered a robust, real-time telemetry dashboard using React and Node.js, showing analytics under 10ms latency.</p>
+              <div class="d-flex align-items-center justify-content-between mt-3 pt-3 border-top border-secondary">
+                <span class="small color-text-muted fw-bold"><i class="bi bi-lightning text-accent"></i> &lt;10ms Latency</span>
+                <a href="case-studies.html?project=saas-analytics" class="btn-premium-outline py-1.5 px-3 fs-7">Read Case Study</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project 4: NLP Support Bots -->
+        <div class="col-md-4 filter-item text-start overflow-hidden" data-category="ai" style="display: flex; flex-direction: column;">
+          <div class="portfolio-card h-100">
+            <div class="portfolio-img-container">
+              <img src="https://images.unsplash.com/photo-1531747118685-ca8fa6e08806?q=80&w=600&auto=format&fit=crop" alt="AI cognitive support agent representation">
+              <span class="portfolio-badge">AI Systems</span>
+            </div>
+            <div class="portfolio-card-content">
+              <h3 class="portfolio-title">Cognitive Support Agent</h3>
+              <p class="portfolio-desc">Custom fine-tuned LLM system that autonomously resolved 60% of inbound user queries for a logistics client.</p>
+              <div class="d-flex align-items-center justify-content-between mt-3 pt-3 border-top border-secondary">
+                <span class="small color-text-muted fw-bold"><i class="bi bi-shield-check text-primary"></i> 60% Auto Resolved</span>
+                <a href="case-studies.html?project=support-agent" class="btn-premium-outline py-1.5 px-3 fs-7">Read Case Study</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project 5: Kubernetes Containerization -->
+        <div class="col-md-4 filter-item text-start overflow-hidden" data-category="cloud" style="display: flex; flex-direction: column;">
+          <div class="portfolio-card h-100">
+            <div class="portfolio-img-container">
+              <img src="https://images.unsplash.com/photo-1667372393119-3d4c48d07fc9?q=80&w=600&auto=format&fit=crop" alt="Docker containerization setup representation">
+              <span class="portfolio-badge">Cloud Migration</span>
+            </div>
+            <div class="portfolio-card-content">
+              <h3 class="portfolio-title">Kubernetes Cluster Config</h3>
+              <p class="portfolio-desc">Engineered auto-scaling Kubernetes nodes with secure pipelines, reducing server compute costs by 35%.</p>
+              <div class="d-flex align-items-center justify-content-between mt-3 pt-3 border-top border-secondary">
+                <span class="small color-text-muted fw-bold"><i class="bi bi-piggy-bank text-purple"></i> 35% Server Savings</span>
+                <a href="case-studies.html?project=k8s-cluster" class="btn-premium-outline py-1.5 px-3 fs-7">Read Case Study</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project 6: B2B E-Commerce -->
+        <div class="col-md-4 filter-item text-start overflow-hidden" data-category="web" style="display: flex; flex-direction: column;">
+          <div class="portfolio-card h-100">
+            <div class="portfolio-img-container">
+              <img src="https://images.unsplash.com/photo-1472851294608-062f824d29cc?q=80&w=600&auto=format&fit=crop" alt="B2B Ecommerce platform screens">
+              <span class="portfolio-badge">Web Application</span>
+            </div>
+            <div class="portfolio-card-content">
+              <h3 class="portfolio-title">Global B2B Marketplace</h3>
+              <p class="portfolio-desc">Constructed a robust Next.js marketplace supporting multi-currency calculations and automated billing cycles.</p>
+              <div class="d-flex align-items-center justify-content-between mt-3 pt-3 border-top border-secondary">
+                <span class="small color-text-muted fw-bold"><i class="bi bi-globe text-accent"></i> 12 currencies supported</span>
+                <a href="case-studies.html?project=b2b-marketplace" class="btn-premium-outline py-1.5 px-3 fs-7">Read Case Study</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Premium Footer -->
+  <footer class="footer-premium">
+    <div class="container">
+      <div class="row g-5">
+        <div class="col-lg-4 col-md-6">
+          <div class="navbar-brand-premium mb-4">
+            <div class="footer-logo-icon">
+              <i class="bi bi-cpu"></i>
+            </div>
+            <span class="fs-4 fw-bold">VR INFO TECH</span>
+          </div>
+          <p class="color-text-muted small mb-4">Engineering high-availability software products, fine-tuned artificial intelligence integrations, and performance-driven growth solutions.</p>
+          <div class="footer-newsletter">
+            <div class="footer-title">Newsletter</div>
+            <form class="footer-newsletter-form d-flex">
+              <input type="email" class="form-control" placeholder="Work email" required aria-label="Work email">
+              <button class="btn-newsletter" type="submit"><i class="bi bi-arrow-right"></i></button>
+            </form>
+          </div>
+        </div>
+
+        <div class="col-lg-2 col-md-6 col-6">
+          <div class="footer-title">Navigation</div>
+          <ul class="footer-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About Company</a></li>
+            <li><a href="services.html">Our Services</a></li>
+            <li><a href="portfolio.html">Case Studies</a></li>
+            <li><a href="contact.html">Connect With Us</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-2 col-md-6 col-6">
+          <div class="footer-title">Capabilities</div>
+          <ul class="footer-links">
+            <li><a href="services.html">AI Automation</a></li>
+            <li><a href="services.html">Next.js Frameworks</a></li>
+            <li><a href="services.html">Cloud Architecture</a></li>
+            <li><a href="services.html">CI/CD DevOps</a></li>
+            <li><a href="services.html">Growth SEO</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+          <div class="footer-title">Support Hub</div>
+          <p class="color-text-muted small mb-2"><i class="bi bi-telephone text-primary me-2"></i> Support: +91-7796390239</p>
+          <p class="color-text-muted small mb-2"><i class="bi bi-envelope text-primary me-2"></i> Inquiry: vrinfotech39@gmail.com</p>
+          <p class="color-text-muted small mb-4"><i class="bi bi-geo-alt text-primary me-2"></i> HQ: Pune, Maharashtra, India</p>
+          <div class="social-icons-row">
+            <a href="#" class="social-icon-btn"><i class="bi bi-linkedin"></i></a>
+            <a href="#" class="social-icon-btn"><i class="bi bi-twitter-x"></i></a>
+            <a href="#" class="social-icon-btn"><i class="bi bi-github"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+        <div class="footer-bottom-text">
+          &copy; 2026 VR Info Tech. All rights reserved. Built with premium assets.
+        </div>
+        <div class="footer-bottom-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms & Conditions</a>
+          <a href="#">Sitemap</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- AOS Scroll Animation JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  
+  <!-- Custom Logic (Loads main.js grid toggle protocols) -->
+  <script src="js/main.js"></script>
+</body>
+</html>

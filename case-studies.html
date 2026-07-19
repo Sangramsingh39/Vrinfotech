@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Case Studies | VR Info Tech | Enterprise Outcomes</title>
+  <meta name="description" content="Read detailed challenge, solution, and outcome logs for VR Info Tech's enterprise engineering integrations.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  
+  <!-- AOS Animation CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+  
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .case-panel {
+      display: none;
+    }
+    .case-panel.active {
+      display: block;
+    }
+    .metric-value-box {
+      font-size: clamp(2rem, 4vw, 2.75rem);
+      font-weight: 800;
+      color: var(--color-primary);
+      font-family: var(--font-display);
+      line-height: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Animated Background Glow Orbs -->
+  <div class="bg-grid"></div>
+  <div class="glow-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- Premium Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top navbar-premium">
+    <div class="container">
+      <a class="navbar-brand navbar-brand-premium" href="index.html">
+        <div class="logo-icon">
+          <i class="bi bi-cpu"></i>
+        </div>
+        <span>VR INFO TECH</span>
+      </a>
+      <button class="navbar-toggler navbar-toggler-premium" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="mainNavbar">
+        <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
+          <li class="nav-item">
+            <a class="nav-link nav-link-premium" href="index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-link-premium" href="about.html">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-link-premium" href="services.html">Services</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-link-premium active" href="portfolio.html">Portfolio</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-link-premium" href="pricing.html">Pricing</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-link-premium" href="trending.html">Trending</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-link-premium" href="contact.html">Contact</a>
+          </li>
+          <li class="nav-item ms-lg-3 mt-3 mt-lg-0">
+            <a class="btn-premium py-2 px-4" href="contact.html">Get Free Audit</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Case Studies Container -->
+  <section class="section-wrapper pt-5 mt-5">
+    <div class="container mt-4">
+      <div class="row g-5">
+        <!-- Main Case Study Content -->
+        <div class="col-lg-8" data-aos="fade-right">
+          
+          <!-- AI Auditor Panel -->
+          <div id="case-ai-auditor" class="case-panel active">
+            <span class="section-badge"><i class="bi bi-cpu-fill"></i> Finance AI Case Study</span>
+            <h1 class="h2 fw-extrabold font-display mb-3 text-white">AI Auditor Anomaly Detection for FinEdge Group</h1>
+            <p class="color-text-muted mb-4 fs-5">How we designed and integrated a private cognitive layer to audit ledger entries, resulting in a 88% reduction in annual auditing errors.</p>
+            
+            <div class="choose-img-card mb-4" style="height: 320px;">
+              <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop" class="w-100 h-100 object-fit-cover" alt="Data interface analysis charts">
+            </div>
+
+            <div class="row g-4 my-4">
+              <div class="col-4 text-center">
+                <div class="glass-card py-3 px-2">
+                  <div class="metric-value-box text-primary">88%</div>
+                  <div class="small color-text-muted mt-1">Error Drop</div>
+                </div>
+              </div>
+              <div class="col-4 text-center">
+                <div class="glass-card py-3 px-2">
+                  <div class="metric-value-box text-purple">4x</div>
+                  <div class="small color-text-muted mt-1">Audit Speed</div>
+                </div>
+              </div>
+              <div class="col-4 text-center">
+                <div class="glass-card py-3 px-2">
+                  <div class="metric-value-box text-success">₹1Cr</div>
+                  <div class="small color-text-muted mt-1">Saved Annually</div>
+                </div>
+              </div>
+            </div>
+
+            <h3 class="h4 fw-bold font-display text-white mt-4 mb-3">The Challenge</h3>
+            <p class="color-text-muted mb-4">
+              FinEdge Group processed over 100,000 ledger records monthly. Their manual compliance review team was bottlenecked, checking entries days after they occurred. Minor billing discrepancies, wrong tax assignments, and fraud flags went undetected, costing significant overheads during year-end tax declarations.
+            </p>
+
+            <h3 class="h4 fw-bold font-display text-white mb-3">The Solution</h3>
+            <p class="color-text-muted mb-4">
+              VR Info Tech engineered a proprietary machine learning model (trained on historical compliance data) integrated into their transactional SQL database pipeline. The model parses new ledger logs, scores them for anomalies in under 20ms, and pushes alerts to compliance officers via automated notifications.
+            </p>
+          </div>
+
+          <!-- Cloud Migration Panel -->
+          <div id="case-cloud-migration" class="case-panel">
+            <span class="section-badge"><i class="bi bi-cloud-check-fill"></i> Cloud migration Case Study</span>
+            <h1 class="h2 fw-extrabold font-display mb-3 text-white">Retail Cloud Migration for RetailFlow Enterprise</h1>
+            <p class="color-text-muted mb-4 fs-5">Transitioning 40+ on-premise inventory systems into high-availability AWS containers, scaling performance to 99.99% operational uptime.</p>
+            
+            <div class="choose-img-card mb-4" style="height: 320px;">
+              <img src="https://images.unsplash.com/photo-1544383835-bda2bc66a55d?q=80&w=800&auto=format&fit=crop" class="w-100 h-100 object-fit-cover" alt="Data center server cabinets lights">
+            </div>
+
+            <div class="row g-4 my-4">
+              <div class="col-4 text-center">
+                <div class="glass-card py-3 px-2">
+                  <div class="metric-value-box text-primary">99.99%</div>
+                  <div class="small color-text-muted mt-1">Uptime SLA</div>
+                </div>
+              </div>
+              <div class="col-4 text-center">
+                <div class="glass-card py-3 px-2">
+                  <div class="metric-value-box text-purple">10x</div>
+                  <div class="small color-text-muted mt-1">Scaling Speed</div>
+                </div>
+              </div>
+              <div class="col-4 text-center">
+                <div class="glass-card py-3 px-2">
+                  <div class="metric-value-box text-success">35%</div>
+                  <div class="small color-text-muted mt-1">Cost Reduction</div>
+                </div>
+              </div>
+            </div>
+
+            <h3 class="h4 fw-bold font-display text-white mt-4 mb-3">The Challenge</h3>
+            <p class="color-text-muted mb-4">
+              RetailFlow operated legacy physical hardware across multiple warehouse zones. During holiday sales peaks, server clusters crashed due to unexpected concurrent request surges. Database locking caused delayed stock listings and resulted in missed customer orders.
+            </p>
+
+            <h3 class="h4 fw-bold font-display text-white mb-3">The Solution</h3>
+            <p class="color-text-muted mb-4">
+              We mapped their inventory database relationships, rewrote the backend interfaces for container execution, and migrated databases to AWS Aurora Serverless. We deployed container tasks inside autoscaling Amazon ECS nodes managed with IaC Terraform configs.
+            </p>
+          </div>
+
+          <!-- SaaS Analytics Panel -->
+          <div id="case-saas-analytics" class="case-panel">
+            <span class="section-badge"><i class="bi bi-window-fullscreen"></i> SaaS Case Study</span>
+            <h1 class="h2 fw-extrabold font-display mb-3 text-white">SaaS Telemetry Dashboard for Apex Logistics</h1>
+            <p class="color-text-muted mb-4 fs-5">Building a real-time global telemetry monitoring interface processing 50,000 requests per second under 10ms frontend rendering latency.</p>
+            
+            <div class="choose-img-card mb-4" style="height: 320px;">
+              <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop" class="w-100 h-100 object-fit-cover" alt="Data metrics graphic dashboard">
+            </div>
+
+            <div class="row g-4 my-4">
+              <div class="col-4 text-center">
+                <div class="glass-card py-3 px-2">
+                  <div class="metric-value-box text-primary">&lt;10ms</div>
+                  <div class="small color-text-muted mt-1">Render Speed</div>
+                </div>
+              </div>
+              <div class="col-4 text-center">
+                <div class="glass-card py-3 px-2">
+                  <div class="metric-value-box text-purple">50k/s</div>
+                  <div class="small color-text-muted mt-1">Request Load</div>
+                </div>
+              </div>
+              <div class="col-4 text-center">
+                <div class="glass-card py-3 px-2">
+                  <div class="metric-value-box text-success">40%</div>
+                  <div class="small color-text-muted mt-1">User Retention</div>
+                </div>
+              </div>
+            </div>
+
+            <h3 class="h4 fw-bold font-display text-white mt-4 mb-3">The Challenge</h3>
+            <p class="color-text-muted mb-4">
+              Apex Logistics monitored thousands of active container locations, dispatch logs, and route data inputs. Their existing dashboards took up to 8 seconds to load, lagging behind real-time fleet events, leading to incorrect routing and delayed driver adjustments.
+            </p>
+
+            <h3 class="h4 fw-bold font-display text-white mb-3">The Solution</h3>
+            <p class="color-text-muted mb-4">
+              We built a custom dashboard using React.js and Next.js and routed telemetry updates via WebSockets. We integrated Redis caching layers to reduce read latency to a bare minimum, enabling dispatchers to see live GPS locations under 10ms.
+            </p>
+          </div>
+
+        </div>
+
+        <!-- Sidebar Navigation -->
+        <div class="col-lg-4" data-aos="fade-left">
+          <!-- Projects List -->
+          <div class="glass-card mb-4">
+            <h3 class="h5 fw-bold font-display mb-3 text-white">Recent Case Studies</h3>
+            <div class="d-flex flex-column gap-2">
+              <button onclick="switchProject('ai-auditor')" id="btn-project-ai-auditor" class="btn btn-premium-outline text-start justify-content-between py-2.5 px-3">
+                AI Financial Auditor <i class="bi bi-chevron-right"></i>
+              </button>
+              <button onclick="switchProject('cloud-migration')" id="btn-project-cloud-migration" class="btn btn-premium-outline text-start justify-content-between py-2.5 px-3">
+                Retail Cloud Migration <i class="bi bi-chevron-right"></i>
+              </button>
+              <button onclick="switchProject('saas-analytics')" id="btn-project-saas-analytics" class="btn btn-premium-outline text-start justify-content-between py-2.5 px-3">
+                SaaS Telemetry Dashboard <i class="bi bi-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Consultant Card -->
+          <div class="glass-card p-4 text-center">
+            <i class="bi bi-stars text-primary fs-2 mb-3"></i>
+            <h4 class="h5 fw-bold font-display mb-2 text-white">Achieve Similar Metrics</h4>
+            <p class="color-text-muted small mb-4">Let us construct a proof of concept scope for your database and performance challenges.</p>
+            <a href="contact.html" class="btn-premium w-100 justify-content-center">Contact Architects</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Premium Footer -->
+  <footer class="footer-premium">
+    <div class="container">
+      <div class="row g-5">
+        <div class="col-lg-4 col-md-6">
+          <div class="navbar-brand-premium mb-4">
+            <div class="footer-logo-icon">
+              <i class="bi bi-cpu"></i>
+            </div>
+            <span class="fs-4 fw-bold">VR INFO TECH</span>
+          </div>
+          <p class="color-text-muted small mb-4">Engineering high-availability software products, fine-tuned artificial intelligence integrations, and performance-driven growth solutions.</p>
+          <div class="footer-newsletter">
+            <div class="footer-title">Newsletter</div>
+            <form class="footer-newsletter-form d-flex">
+              <input type="email" class="form-control" placeholder="Work email" required aria-label="Work email">
+              <button class="btn-newsletter" type="submit"><i class="bi bi-arrow-right"></i></button>
+            </form>
+          </div>
+        </div>
+
+        <div class="col-lg-2 col-md-6 col-6">
+          <div class="footer-title">Navigation</div>
+          <ul class="footer-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="about.html">About Company</a></li>
+            <li><a href="services.html">Our Services</a></li>
+            <li><a href="portfolio.html">Case Studies</a></li>
+            <li><a href="contact.html">Connect With Us</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-2 col-md-6 col-6">
+          <div class="footer-title">Capabilities</div>
+          <ul class="footer-links">
+            <li><a href="services.html">AI Automation</a></li>
+            <li><a href="services.html">Next.js Frameworks</a></li>
+            <li><a href="services.html">Cloud Architecture</a></li>
+            <li><a href="services.html">CI/CD DevOps</a></li>
+            <li><a href="services.html">Growth SEO</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-4 col-md-6">
+          <div class="footer-title">Support Hub</div>
+          <p class="color-text-muted small mb-2"><i class="bi bi-telephone text-primary me-2"></i> Support: +91-7796390239</p>
+          <p class="color-text-muted small mb-2"><i class="bi bi-envelope text-primary me-2"></i> Inquiry: vrinfotech39@gmail.com</p>
+          <p class="color-text-muted small mb-4"><i class="bi bi-geo-alt text-primary me-2"></i> HQ: Pune, Maharashtra, India</p>
+          <div class="social-icons-row">
+            <a href="#" class="social-icon-btn"><i class="bi bi-linkedin"></i></a>
+            <a href="#" class="social-icon-btn"><i class="bi bi-twitter-x"></i></a>
+            <a href="#" class="social-icon-btn"><i class="bi bi-github"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+        <div class="footer-bottom-text">
+          &copy; 2026 VR Info Tech. All rights reserved. Built with premium assets.
+        </div>
+        <div class="footer-bottom-links">
+          <a href="#">Privacy Policy</a>
+          <a href="#">Terms & Conditions</a>
+          <a href="#">Sitemap</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- AOS Scroll Animation JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+  <!-- Custom Logic -->
+  <script src="js/main.js"></script>
+  
+  <script>
+    function switchProject(projectKey) {
+      const panels = document.querySelectorAll('.case-panel');
+      panels.forEach(p => p.classList.remove('active'));
+
+      const activePanel = document.getElementById('case-' + projectKey);
+      if (activePanel) {
+        activePanel.classList.add('active');
+      }
+
+      const sidebarBtns = document.querySelectorAll('[id^="btn-project-"]');
+      sidebarBtns.forEach(btn => {
+        btn.classList.remove('active');
+        btn.style.borderColor = 'rgba(255,255,255,0.15)';
+        btn.style.color = 'var(--color-text-main)';
+      });
+
+      const activeBtn = document.getElementById('btn-project-' + projectKey);
+      if (activeBtn) {
+        activeBtn.classList.add('active');
+        activeBtn.style.borderColor = 'var(--color-primary)';
+        activeBtn.style.color = 'var(--color-primary)';
+      }
+
+      const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?project=' + projectKey;
+      window.history.pushState({path:newUrl}, '', newUrl);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const project = urlParams.get('project') || 'ai-auditor';
+      switchProject(project);
+    });
+  </script>
+</body>
+</html>
